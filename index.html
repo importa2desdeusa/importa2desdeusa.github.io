@@ -645,7 +645,8 @@ const COSTOS = {
   servicioConces: 3000,    // gestión Importa2, concesionario (va dentro del precio de la compra)
   envioTierra: 2999,       // envío a tierra firme
   envioMargarita: 3399,    // envío a Margarita
-  comisionSubasta: 0.10    // comisión estimada de la subasta
+  comisionSubasta: 0.10,   // comisión estimada de la subasta (por confirmar con el broker)
+  broker: 500              // broker de subasta, lo paga el cliente
 };
 const WA = '16893392098';
 
@@ -856,13 +857,13 @@ function calcular(){
   const serv=sub?COSTOS.servicioSubasta:COSTOS.servicioConces;
   const dest=$('#cDest')?$('#cDest').value:'tierra';
   const envio=dest==='margarita'?COSTOS.envioMargarita:COSTOS.envioTierra;
-  const compra=puja+com+serv;
+  const compra=puja+com+serv+(sub?COSTOS.broker:0);
   const total=compra+envio;
   $('#lines').innerHTML=`
     <div class="line"><span>Tu camioneta, comprada y lista para embarcar</span><b>${usd(compra)}</b></div>
     <div class="line"><span>Envío ${dest==='margarita'?'a Margarita':'a tierra firme'}</span><b>${usd(envio)}</b></div>
     <div class="tot"><span>Total con el envío incluido</span><b>${usd(total)}</b></div>
-    <div class="note">Incluye la compra de la camioneta${sub?', la comisión de la subasta':''} y toda nuestra gestión hasta que llega a Venezuela. <b>La nacionalización va aparte y no está incluida en este total:</b> puedes hacerla con tu propio agente aduanal, o pedir que la gestionemos nosotros. Si la quieres con nosotros, márcalo en tu orden de compra y te la cotizamos para tu camioneta, porque los montos de aduana cambian caso por caso.</div>`;
+    <div class="note">Incluye la compra de la camioneta${sub?', la comisión de la subasta, el broker':''} y toda nuestra gestión hasta que llega a Venezuela. <b>La nacionalización va aparte y no está incluida en este total:</b> puedes hacerla con tu propio agente aduanal, o pedir que la gestionemos nosotros. Si la quieres con nosotros, márcalo en tu orden de compra y te la cotizamos para tu camioneta, porque los montos de aduana cambian caso por caso.</div>`;
 }
 function copiar(t){ try{navigator.clipboard.writeText(t);toast('VIN copiado')}catch(e){toast(t)} }
 function comprar(){
