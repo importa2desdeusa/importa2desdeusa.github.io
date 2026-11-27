@@ -892,8 +892,7 @@ function ficha(id){
       <p style="font-size:12.5px;color:var(--muted);margin:-4px 0 12px;line-height:1.45">Tu asesor te escribe a este número para seguir con tu orden.</p>
       <div class="field"><label>Tu nombre</label><input id="oNom" value="${usuario?esc(usuario.nombre):''}" autocomplete="name"></div>
       <div class="field"><label>WhatsApp</label><input id="oWa" type="tel" value="${usuario?esc(usuario.wa||''):''}" placeholder="+58 4xx xxx xxxx" autocomplete="tel"></div>
-      <div class="field"><label>¿Dónde vives?</label><input id="oCiu" value="${usuario&&usuario.ciudad&&usuario.ciudad!=='—'?esc(usuario.ciudad):''}" placeholder="Ej. Caracas, Valencia, Porlamar"></div>
-      <div class="field" style="margin-bottom:0"><label>¿A qué hora prefieres que te escribamos?</label><select id="oHora"><option>A cualquier hora</option><option>En la mañana</option><option>En la tarde</option><option>En la noche</option></select></div>
+      <div class="field" style="margin-bottom:0"><label>¿Dónde vives?</label><input id="oCiu" value="${usuario&&usuario.ciudad&&usuario.ciudad!=='—'?esc(usuario.ciudad):''}" placeholder="Ej. Caracas, Valencia, Porlamar"></div>
     </div>
 
     <div class="box"><h3>Servicios adicionales</h3>
@@ -944,15 +943,15 @@ function copiar(t){ try{navigator.clipboard.writeText(t);toast('VIN copiado')}ca
 function comprar(){
   if(!usuario){abrir('registro');return}
   const g=id=>{const e=document.getElementById(id);return e?e.value.trim():''};
-  const cNom=g('oNom')||usuario.nombre, cWa=g('oWa'), cCiu=g('oCiu'), cHora=g('oHora');
+  const cNom=g('oNom')||usuario.nombre, cWa=g('oWa'), cCiu=g('oCiu');
   if(cWa.replace(/\D/g,'').length<10){ toast('Escribe tu WhatsApp con el código del país'); const w=document.getElementById('oWa'); if(w){w.focus();w.scrollIntoView({block:'center'});} return; }
   if(!cCiu){ toast('Dinos en qué ciudad vives'); const w=document.getElementById('oCiu'); if(w){w.focus();w.scrollIntoView({block:'center'});} return; }
   if(!usuario.wa){ usuario.wa=cWa; guardar(); if(sb&&usuario.uid) sb.from('perfiles').update({whatsapp:cWa}).eq('id',usuario.uid).then(()=>{}); }
   const c=actual, ex=[...document.querySelectorAll('.extra input:checked')].map(i=>EXTRAS.find(e=>e.id===i.value).n);
   const cod='I2-'+Math.random().toString(36).slice(2,7).toUpperCase();
   const pr=prefs();
-  if(sb&&usuario.uid){ sb.from('ordenes').insert({codigo:cod,vehiculo:`${c.an} ${c.marca} ${c.mod}`,detalle:{rubro:c.cat,lote:c.lote||'',vin:c.vin||'',precio:c.puja||null,prefs:pr,extras:ex,cliente:cNom,whatsapp:cWa,ciudad:cCiu,hora:cHora}}).then(({error})=>{ if(error) toast('No se pudo guardar en línea: envíanos la orden por WhatsApp.'); }); }
-  avisarAnyi('Nueva orden '+cod+' · '+`${c.an} ${c.marca} ${c.mod}`,{Orden:cod,'Vehículo':`${c.an} ${c.marca} ${c.mod}`,Rubro:c.cat==='publica'?'Subasta pública ('+c.sub+')':c.cat==='privada'?'Subasta privada (por encargo)':'Concesionario 0 km',Lote:c.lote||'',VIN:c.vin||'',Precio:c.puja?usd(c.puja):'Se cotiza','Cómo la quiere':pr||'—',Servicios:ex.join(', ')||'—',Cliente:cNom,WhatsApp:cWa,Correo:usuario.mail||'','Vive en':cCiu,'Prefiere que le escriban':cHora});
+  if(sb&&usuario.uid){ sb.from('ordenes').insert({codigo:cod,vehiculo:`${c.an} ${c.marca} ${c.mod}`,detalle:{rubro:c.cat,lote:c.lote||'',vin:c.vin||'',precio:c.puja||null,prefs:pr,extras:ex,cliente:cNom,whatsapp:cWa,ciudad:cCiu}}).then(({error})=>{ if(error) toast('No se pudo guardar en línea: envíanos la orden por WhatsApp.'); }); }
+  avisarAnyi('Nueva orden '+cod+' · '+`${c.an} ${c.marca} ${c.mod}`,{Orden:cod,'Vehículo':`${c.an} ${c.marca} ${c.mod}`,Rubro:c.cat==='publica'?'Subasta pública ('+c.sub+')':c.cat==='privada'?'Subasta privada (por encargo)':'Concesionario 0 km',Lote:c.lote||'',VIN:c.vin||'',Precio:c.puja?usd(c.puja):'Se cotiza','Cómo la quiere':pr||'—',Servicios:ex.join(', ')||'—',Cliente:cNom,WhatsApp:cWa,Correo:usuario.mail||'','Vive en':cCiu});
   ordenes.unshift({cod,id:c.id,nom:`${c.an} ${c.marca} ${c.mod}`,ex,pr,paso:1,fecha:new Date().toLocaleDateString('es-VE')}); guardar();
   toast('Orden '+cod+' creada. Tu asesor te escribe por WhatsApp.');
   irA('ordenes');
@@ -1023,7 +1022,7 @@ async function pintarPanel(){
   const tabs=`<div class="seg">${[['ordenes','Órdenes ('+O.length+')'],['flotillas','Flotillas ('+F.length+')'],['clientes','Clientes ('+P.length+')']].map(([k,n])=>`<button class="${panelTab===k?'on':''}" onclick="panelTab='${k}';pintarPanel()">${n}</button>`).join('')}</div>`;
   let h='';
   if(panelTab==='ordenes') h=O.map(x=>{const c=per[x.user_id]||{}, d=x.detalle||{}; return `<div class="box"><h3>${esc(x.vehiculo)}</h3><div style="font-size:12px;color:var(--muted);margin:-6px 0 10px">Orden ${esc(x.codigo)} · ${new Date(x.creado).toLocaleDateString('es-VE')}</div>
-    <div style="font-size:13px;line-height:1.6"><b>${esc(c.nombre||d.cliente)}</b> · ${esc(c.correo)}<br>${wa(d.whatsapp||c.whatsapp)} · Vive en ${esc(d.ciudad||c.ciudad||'—')}${d.hora?' · '+esc(d.hora):''}<br>${d.lote?'Lote '+esc(d.lote)+' · ':''}${d.vin?'VIN '+esc(d.vin)+' · ':''}${d.precio?usd(d.precio):''}${d.prefs?'<br>Cómo la quiere: '+esc(d.prefs):''}${d.extras&&d.extras.length?'<br>Servicios: '+esc(d.extras.join(', ')):''}</div>
+    <div style="font-size:13px;line-height:1.6"><b>${esc(c.nombre||d.cliente)}</b> · ${esc(c.correo)}<br>${wa(d.whatsapp||c.whatsapp)} · Vive en ${esc(d.ciudad||c.ciudad||'—')}<br>${d.lote?'Lote '+esc(d.lote)+' · ':''}${d.vin?'VIN '+esc(d.vin)+' · ':''}${d.precio?usd(d.precio):''}${d.prefs?'<br>Cómo la quiere: '+esc(d.prefs):''}${d.extras&&d.extras.length?'<br>Servicios: '+esc(d.extras.join(', ')):''}</div>
     <div class="field" style="margin:12px 0 0"><label>Etapa que ve el cliente</label><select onchange="cambiarPaso(${x.id},this.value)">${PASOS.map((s,i)=>`<option value="${i+1}" ${x.paso===i+1?'selected':''}>${etapa(i+1)}</option>`).join('')}</select></div></div>`}).join('')||'<div class="empty">Todavía no hay órdenes.</div>';
   else if(panelTab==='flotillas') h=F.map(x=>`<div class="box"><h3>${esc(x.empresa)} · ${esc(x.cantidad)} unidades</h3><div style="font-size:12px;color:var(--muted);margin:-6px 0 10px">${esc(x.codigo)} · ${new Date(x.creado).toLocaleDateString('es-VE')}</div>
     <div style="font-size:13px;line-height:1.6">${esc(x.nombre)} · ${esc(x.tipo)}<br>${wa(x.whatsapp)}<br>Modelos: ${esc(x.modelos)}${x.presupuesto?'<br>Presupuesto: $'+esc(x.presupuesto)+' por unidad':''}<br>Recibe en ${esc(x.destino)} · ${esc(x.cuando)}</div>
