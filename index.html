@@ -1351,9 +1351,9 @@ async function abrirInstalar(espera){
   if(!esIOS&&!enAppAjena&&!espera){ for(let i=0;i<8&&!deferredInstall;i++) await new Promise(r=>setTimeout(r,250)); if(deferredInstall) return instalarYa(); }
   let txt, pos;
   if(enAppAjena){ txt='Abre este link en '+(esIOS?'Safari':'Chrome')+' para instalar el app'; pos='arriba'; }
-  else if(esIOS){ txt='Toca '+ICO_SHARE+' abajo y luego <b>"Agregar a inicio"</b>'; pos='abajo'; }
-  else if(esSamsung){ txt='Toca <b>≡</b> abajo y luego <b>"Agregar página a"</b> › <b>"Pantalla de inicio"</b>'; pos='abajo'; }
-  else { txt='Toca <b>⋮</b> arriba y luego <b>"Instalar app"</b>'; pos='arriba'; }
+  else if(esIOS){ txt='Toca el ícono '+ICO_SHARE+' que está abajo en tu pantalla y luego toca <b>"Agregar a inicio"</b>'; pos='abajo'; }
+  else if(esSamsung){ txt='Toca el ícono <b>≡</b> que está abajo en tu pantalla y luego toca <b>"Agregar página a"</b> › <b>"Pantalla de inicio"</b>'; pos='abajo'; }
+  else { txt='Toca el ícono <b>⋮</b> que está arriba en tu pantalla y luego toca <b>"Instalar app"</b>'; pos='arriba'; }
   $('#instCard').innerHTML=`<div class="ib"><img src="img/icon-192.png?v=3" alt=""><div>${txt}</div><button onclick="cerrarInstalar()" aria-label="Cerrar">✕</button></div>${enAppAjena?'<button class="btn gold" style="margin-top:10px" onclick="copiarLink()">Copiar el link</button>':''}<div class="flecha2 ${pos}">${pos==='abajo'?'↓':'↑'}</div>`;
   $('#inst').className='inst on '+pos;
 }
