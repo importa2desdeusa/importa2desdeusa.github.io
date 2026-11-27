@@ -599,7 +599,7 @@ nav .wa svg{stroke:#1FA855}
     <h3>4. La orden de compra</h3>
     <p>Generar una orden no es una compra ni un contrato. Es una solicitud: tu asesor te contacta, revisa contigo el vehículo, los servicios y los montos, y la compra solo avanza cuando los dos la confirman por escrito.</p>
     <h3>5. Pagos en 3 etapas</h3>
-    <p>Pagas en tres momentos: compra, embarque y aduana. Cada etapa se paga cuando la anterior está cumplida. Los montos y las formas de pago se indican por escrito en cada orden.</p>
+    <p>Pagas en tres momentos: compra, embarque y aduana. El pago de la compra se hace antes de pujar o de comprar, porque Importa2 responde con ese dinero ante la subasta, el broker o el concesionario. En subasta pagas tu puja máxima: si la camioneta se gana por menos, la diferencia se abona al pago del envío. Los pagos se reciben por transferencia bancaria o por Zelle.</p>
     <h3>6. Estado de los vehículos de subasta</h3>
     <p>Las subastas venden los vehículos en el estado en que se encuentran. Te ayudamos a revisar la información del lote, pero Importa2 no garantiza su condición mecánica ni estética. Las reparaciones son servicios opcionales que se cotizan aparte.</p>
     <h3>7. Requisitos en Venezuela</h3>
@@ -607,7 +607,7 @@ nav .wa svg{stroke:#1FA855}
     <h3>8. Tiempos de entrega</h3>
     <p>El tiempo de navegación es de unos 10 a 15 días. Es un estimado: la naviera, el puerto, la aduana o el clima pueden causar demoras que no dependen de nosotros.</p>
     <h3>9. Cancelaciones y reembolsos</h3>
-    <p>Las condiciones de cancelación se acuerdan por escrito en cada orden. Los montos ya pagados a terceros, como la subasta, el concesionario o la naviera, no se pueden reembolsar una vez hechos.</p>
+    <p>Si se pierde una subasta, algo normal en este mercado, seguimos buscando otras opciones con el mismo dinero. Si al final ninguna opción te interesa, te devolvemos lo pagado menos un fee de diligencia de $500 por el trabajo de búsqueda y puja. Una vez comprada la camioneta no hay devolución. Los montos ya pagados a terceros, como la subasta, el concesionario o la naviera, no se pueden reembolsar una vez hechos.</p>
     <h3>10. Millas Importa2</h3>
     <p>Las Millas son un programa de beneficios. No tienen valor en efectivo ni se pueden transferir. Se suman cuando la compra se completa, duran 12 meses y se canjean con tu asesor por los servicios indicados en el app. Importa2 puede cambiar o terminar el programa avisándolo en el app.</p>
     <h3>11. Ley aplicable</h3>
@@ -645,6 +645,7 @@ nav .wa svg{stroke:#1FA855}
 <!-- FICHA -->
 <div class="view ficha" id="v-ficha"></div>
 <div class="view" id="v-resumen"></div>
+<div class="view" id="v-pagar"></div>
 
 <nav id="nav">
   <button class="on" data-v="inicio" onclick="irA('inicio')"><svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 10l8-6 8 6v9H3z"/><path d="M9 19v-5h4v5"/></svg>Inicio</button>
@@ -683,6 +684,8 @@ nav .wa svg{stroke:#1FA855}
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 /* ===== CIFRAS PARA CONFIRMAR CON ANYI ===== */
+const PAGO={ banco:'', titular:'', direccion:'', cuenta:'', routing:'', zelle:'', feeDiligencia:500 };
+async function cargarCobro(){ if(!sb) return; try{ const {data}=await sb.from('datos_cobro').select('*').eq('id',1).maybeSingle(); if(data) ['banco','titular','direccion','cuenta','routing','zelle'].forEach(k=>PAGO[k]=data[k]||''); }catch(e){} }
 const COSTOS = {
   servicioSubasta: 4000,   // gestión Importa2, subasta o alto valor (va dentro del precio de la compra)
   servicioConces: 3000,    // gestión Importa2, concesionario (va dentro del precio de la compra)
@@ -772,7 +775,7 @@ async function cargarCuenta(){
     const {data:p}=await sb.from('perfiles').select('*').eq('id',u.id).maybeSingle();
     usuario={uid:u.id,nombre:(p&&p.nombre)||u.email.split('@')[0],wa:(p&&p.whatsapp)||'',mail:u.email,ciudad:(p&&p.ciudad)||'—',tipo:(p&&p.tipo)||'—',millas:p?p.millas:100,admin:!!(p&&p.es_admin)};
     const {data:os}=await sb.from('ordenes').select('*').eq('user_id',u.id).order('creado',{ascending:false});
-    if(os) ordenes=os.map(o=>({cod:o.codigo,nom:o.vehiculo,paso:o.paso,fecha:new Date(o.creado).toLocaleDateString('es-VE'),pr:(o.detalle||{}).prefs||'',ex:(o.detalle||{}).extras||[]}));
+    if(os) ordenes=os.map(o=>({cod:o.codigo,nom:o.vehiculo,paso:o.paso,fecha:new Date(o.creado).toLocaleDateString('es-VE'),pr:(o.detalle||{}).prefs||'',ex:(o.detalle||{}).extras||[],pago1:(o.detalle||{}).pago1||0,pago:(o.detalle||{}).pago||null}));
     guardar(); refrescar();
     if($('#v-ordenes').classList.contains('on'))pintarOrdenes();
     if($('#v-perfil').classList.contains('on'))pintarPerfil();
@@ -824,7 +827,7 @@ window.addEventListener('popstate',e=>{
   enPop=true; navDepth=Math.max(0,navDepth-1);
   document.querySelectorAll('.modal.on').forEach(m=>m.classList.remove('on'));
   const s=e.state||{v:'inicio'};
-  try{ if(s.f) ficha(s.f); else if(s.r&&actual) resumen(); else irA(s.v||'inicio'); }catch(err){ irA('inicio'); }
+  try{ if(s.f) ficha(s.f); else if(s.p) pagar(s.p); else if(s.r&&actual) resumen(); else irA(s.v||'inicio'); }catch(err){ irA('inicio'); }
   enPop=false;
 });
 function irA(v){
@@ -934,7 +937,8 @@ function resumen(){
     const f={}; ['pCol1','pCol2','pVer','pTrac','pAnio','pMi','pNota','cPuja','cDest'].forEach(k=>{const e=document.getElementById(k); if(e) f[k]=e.value;});
     const sub=c.cat!=='conces', puja=f.cPuja!=null?(+f.cPuja||0):(c.puja||0);
     const total=puja?puja+(sub?feeSubasta(puja)+COSTOS.broker:0)+(sub?COSTOS.servicioSubasta:COSTOS.servicioConces)+(f.cDest==='margarita'?COSTOS.envioMargarita:COSTOS.envioTierra):0;
-    carrito={c,f,pr:prefs(),puja,total,dest:f.cDest==='margarita'?'Margarita':'tierra firme',ex:(carrito&&carrito.c.id===c.id?carrito.ex:[])};
+    const envioK=f.cDest==='margarita'?COSTOS.envioMargarita:COSTOS.envioTierra;
+    carrito={c,f,pr:prefs(),puja,total,pago1:total?total-envioK:0,dest:f.cDest==='margarita'?'Margarita':'tierra firme',ex:(carrito&&carrito.c.id===c.id?carrito.ex:[])};
   }
   if(!carrito) return;
   marcar({r:1});
@@ -947,6 +951,11 @@ function resumen(){
       ${k.pr?`<div style="font-size:12.5px;color:var(--muted);margin-top:10px;line-height:1.5"><b style="color:var(--navy)">Cómo la quieres:</b> ${esc(k.pr)}</div>`:''}
       <div style="margin-top:12px;display:flex;justify-content:space-between;gap:12px;align-items:baseline;border-top:1px solid var(--line);padding-top:10px;font-size:13.5px"><span style="color:var(--muted)">Total estimado con envío a ${k.dest}</span><b style="font-size:17px;color:var(--navy);white-space:nowrap">${k.total?usd(k.total):'Se cotiza'}</b></div>
     </div>
+    ${k.pago1?`<div class="box"><h3>Cómo se paga</h3>
+      <div style="display:flex;justify-content:space-between;gap:12px;align-items:baseline;font-size:13.5px"><span><b style="color:var(--navy)">Pago 1 · tu camioneta</b><br><span style="color:var(--muted);font-size:12px">${c.cat==='conces'?'Antes de comprarla':'Antes de pujar, por tu puja máxima'}</span></span><b style="font-size:17px;color:var(--navy);white-space:nowrap">${usd(k.pago1)}</b></div>
+      <div style="font-size:12.5px;color:var(--muted);margin-top:8px">Pago 2 · envío y Pago 3 · aduana, cuando llegue cada etapa.</div>
+      ${c.cat!=='conces'?`<ul style="font-size:12.5px;color:var(--muted);line-height:1.5;margin:10px 0 0 18px;padding:0"><li>Si se gana por menos, la diferencia se abona a tu envío.</li><li>Si se pierde la subasta, seguimos buscando con el mismo dinero.</li><li>Si ninguna opción te interesa, te devolvemos todo menos $${PAGO.feeDiligencia} de diligencia.</li></ul>`:''}
+    </div>`:''}
     <div class="box"><h3>¿Quieres agregarle algo?</h3>
       <p style="font-size:12.5px;color:var(--muted);margin:-4px 0 12px;line-height:1.45">Toca los que quieras. Tu asesor te los cotiza junto con tu orden.</p>
       <div class="svcs">${EXTRAS.map(e=>`<button type="button" class="svc ${k.ex.includes(e.id)?'on':''}" data-id="${e.id}" onclick="toggleSvc(this)"><div><b>${e.n}</b><small>${e.d}</small></div><span class="add">${k.ex.includes(e.id)?'✓ Agregado':'+ Agregar'}</span></button>`).join('')}</div>
@@ -1004,11 +1013,13 @@ function comprar(){
   const c=actual, ex=carrito.ex.map(id=>EXTRAS.find(e=>e.id===id).n);
   const cod='I2-'+Math.random().toString(36).slice(2,7).toUpperCase();
   const pr=carrito.pr;
-  if(sb&&usuario.uid){ sb.from('ordenes').insert({codigo:cod,vehiculo:`${c.an} ${c.marca} ${c.mod}`,detalle:{rubro:c.cat,lote:c.lote||'',vin:c.vin||'',precio:carrito.puja||null,total:carrito.total||null,destino:carrito.dest,prefs:pr,extras:ex,cliente:cNom,whatsapp:cWa,ciudad:cCiu}}).then(({error})=>{ if(error) toast('No se pudo guardar en línea: envíanos la orden por WhatsApp.'); }); }
+  if(sb&&usuario.uid){ sb.from('ordenes').insert({codigo:cod,vehiculo:`${c.an} ${c.marca} ${c.mod}`,detalle:{rubro:c.cat,lote:c.lote||'',vin:c.vin||'',precio:carrito.puja||null,total:carrito.total||null,pago1:carrito.pago1||null,destino:carrito.dest,prefs:pr,extras:ex,cliente:cNom,whatsapp:cWa,ciudad:cCiu}}).then(({error})=>{ if(error) toast('No se pudo guardar en línea: envíanos la orden por WhatsApp.'); }); }
   avisarAnyi('Nueva orden '+cod+' · '+`${c.an} ${c.marca} ${c.mod}`,{Orden:cod,'Vehículo':`${c.an} ${c.marca} ${c.mod}`,Rubro:c.cat==='publica'?'Subasta pública ('+c.sub+')':c.cat==='privada'?'Subasta privada (por encargo)':'Concesionario 0 km',Lote:c.lote||'',VIN:c.vin||'',Precio:carrito.puja?usd(carrito.puja):'Se cotiza','Total estimado':carrito.total?usd(carrito.total)+' (envío a '+carrito.dest+')':'Se cotiza','Cómo la quiere':pr||'—',Servicios:ex.join(', ')||'—',Cliente:cNom,WhatsApp:cWa,Correo:usuario.mail||'','Vive en':cCiu});
-  ordenes.unshift({cod,id:c.id,nom:`${c.an} ${c.marca} ${c.mod}`,ex,pr,paso:1,fecha:new Date().toLocaleDateString('es-VE')}); guardar();
+  ordenes.unshift({cod,id:c.id,nom:`${c.an} ${c.marca} ${c.mod}`,ex,pr,paso:1,pago1:carrito.pago1||0,pago:null,fecha:new Date().toLocaleDateString('es-VE')}); guardar();
   toast('Orden '+cod+' creada. Tu asesor te escribe por WhatsApp.');
-  carrito=null; irA('ordenes');
+  const p1=carrito.pago1; carrito=null;
+  if(p1){ setTimeout(()=>pagar(cod),400); return; }
+  irA('ordenes');
   const msg=`Hola, soy ${cNom}. Generé la orden ${cod} para la ${c.an} ${c.marca} ${c.mod} ${c.cat==='publica'?'(lote '+c.lote+', VIN '+c.vin+')':c.cat==='privada'?'(por encargo, subasta privada)':'(0 km de concesionario)'}.${pr?' Cómo la quiero: '+pr+'.':''}${ex.length?' Servicios: '+ex.join(', ')+'.':''}`;
   $('#ordenesBox').insertAdjacentHTML('afterbegin',`<a class="btn gold" style="text-decoration:none;margin-top:14px" href="https://wa.me/${WA}?text=${encodeURIComponent(msg)}" target="_blank" rel="noopener">Enviar mi orden por WhatsApp</a>`);
 }
@@ -1022,8 +1033,60 @@ function pintarOrdenes(){
   if(!vivas.length){b.innerHTML='<div class="empty">Todavía no tienes órdenes. Escoge tu camioneta y la rastreas aquí hasta tu puerta.</div>';return}
   b.innerHTML=vivas.map(o=>`<div class="box" ${o.paso===0?'style="opacity:.6"':''}><h3>${o.nom}</h3><div class="sub" style="font-size:12px;color:var(--muted);margin:-6px 0 14px">Orden ${o.cod} · ${o.fecha}</div>
     ${o.paso===0?'<div style="font-size:14px;font-weight:700;color:#B3261E">Orden cancelada</div>':`<div class="track">${PASOS.map((p,i)=>`<div class="tk ${i<o.paso?'done':i===o.paso?'now':''}"><b>${p[0]}</b><p>${p[1]}</p></div>`).join('')}</div>
-    ${o.paso===1?`<button class="btn line" style="margin-top:4px;border-color:#B3261E;color:#B3261E;font-size:14px;padding:11px" onclick="cancelarOrden('${o.cod}')">Cancelar orden</button>`:`<p style="font-size:12px;color:var(--muted);margin-top:4px">Para cambios o cancelación, habla con tu asesor.</p>`}`}</div>`).join('');
+    ${o.pago?`<div style="background:#FFF9EC;border:1px solid var(--gold);border-radius:12px;padding:10px 12px;font-size:13px;margin-bottom:10px"><b>Pago enviado: ${usd(o.pago.monto||0)}</b><br><span style="color:var(--muted)">${o.paso>=2?'Pago verificado':'Por verificar'} · ${esc(o.pago.metodo)}</span></div>`:(o.pago1&&o.paso<=2?`<button class="btn gold" style="margin-bottom:10px" onclick="pagar('${o.cod}')">Pagar mi camioneta · ${usd(o.pago1)}</button>`:'')}
+    ${o.paso===1&&!o.pago?`<button class="btn line" style="margin-top:4px;border-color:#B3261E;color:#B3261E;font-size:14px;padding:11px" onclick="cancelarOrden('${o.cod}')">Cancelar orden</button>`:`<p style="font-size:12px;color:var(--muted);margin-top:4px">Para cambios o cancelación, habla con tu asesor.</p>`}`}</div>`).join('');
 }
+let pagoCod=null, pagoMetodo='Transferencia bancaria';
+async function pagar(cod){
+  const o=ordenes.find(x=>x.cod===cod); if(!o) return;
+  if(!PAGO.cuenta) await cargarCobro(); pagoCod=cod; marcar({p:cod});
+  const m=o.pago1||0, zelleOk=m<=5000&&!!PAGO.zelle; if(!zelleOk) pagoMetodo='Transferencia bancaria';
+  const copia=(t,l)=>`<div class="line" style="display:flex;justify-content:space-between;gap:10px;padding:6px 0;font-size:13.5px"><span style="color:var(--muted)">${l}</span><b style="text-align:right;cursor:pointer" onclick="copiarTxt('${esc(t)}')">${esc(t)} <span style="color:var(--gold);font-size:11px">copiar</span></b></div>`;
+  $('#v-pagar').innerHTML=`<div class="top"><div class="top-row"><button class="iconbtn" onclick="atras()" aria-label="Volver"><svg width="18" height="18" fill="none" stroke="#fff" stroke-width="2"><path d="M11 4L6 9l5 5"/></svg></button></div><div class="hello" style="margin-top:10px"><small>Orden ${esc(cod)} · ${esc(o.nom)}</small><span>Paga tu camioneta</span></div></div>
+  <section>
+    <div class="box" style="text-align:center"><small style="color:var(--muted)">Pago 1 · tu camioneta</small><div style="font-size:32px;font-weight:800;color:var(--navy);margin-top:4px">${usd(m)}</div></div>
+    <div class="box"><h3>¿Cómo vas a pagar?</h3>
+      <div class="seg" style="margin-bottom:12px"><button class="${pagoMetodo==='Transferencia bancaria'?'on':''}" onclick="pagoMetodo='Transferencia bancaria';pagar('${cod}')">Transferencia</button><button class="${pagoMetodo==='Zelle'?'on':''}" ${zelleOk?`onclick="pagoMetodo='Zelle';pagar('${cod}')"`:'disabled style="opacity:.4"'}>Zelle</button></div>
+      ${pagoMetodo==='Zelle'?copia(PAGO.zelle,'Zelle')+copia(PAGO.titular,'A nombre de'):(PAGO.cuenta?copia(PAGO.banco,'Banco')+copia(PAGO.titular,'A nombre de')+copia(PAGO.direccion,'Dirección')+copia(PAGO.cuenta,'Cuenta')+copia(PAGO.routing,'Routing'):'<p style="font-size:13px;color:var(--muted)">No pudimos cargar los datos de pago. Revisa tu conexión o pídeselos a tu asesor.</p>')}
+      <p style="font-size:12px;color:var(--muted);margin-top:8px">La transferencia debe salir de una cuenta en Estados Unidos.</p>
+      ${copia(cod,'Pon en la referencia')}
+      ${zelleOk||!PAGO.zelle?'':'<p style="font-size:12px;color:var(--muted);margin-top:8px">Para este monto el pago es por transferencia: Zelle tiene límites diarios.</p>'}
+    </div>
+    <div class="box"><h3>Cuando hayas pagado</h3>
+      <div class="field"><label>Número de confirmación</label><input id="pRef" placeholder="Lo encuentras en el recibo de tu banco"></div>
+      <div class="field" style="margin-bottom:0"><label>Foto o captura del comprobante</label><input id="pFile" type="file" accept="image/*,application/pdf"></div>
+    </div>
+    <div style="height:90px"></div>
+  </section>`;
+  document.querySelectorAll('.view').forEach(x=>x.classList.remove('on')); $('#v-pagar').classList.add('on');
+  $('#nav').style.display='none'; const old=$('.sticky'); if(old) old.remove();
+  const st=document.createElement('div'); st.className='sticky';
+  st.innerHTML=`<button class="btn line" style="flex:0 0 auto;width:auto;padding:14px" onclick="irA('ordenes')">Luego</button><button class="btn gold" id="pBtn" onclick="enviarPago()">Ya pagué</button>`;
+  document.body.appendChild(st); window.scrollTo(0,0);
+}
+function copiarTxt(t){ try{navigator.clipboard.writeText(t);toast('Copiado')}catch(e){toast(t)} }
+async function enviarPago(){
+  const o=ordenes.find(x=>x.cod===pagoCod); if(!o) return;
+  const ref=($('#pRef').value||'').trim(), file=$('#pFile').files[0];
+  if(!ref&&!file){ toast('Pon el número de confirmación o sube el comprobante'); return; }
+  const btn=$('#pBtn'); btn.disabled=true; btn.textContent='Enviando…';
+  let archivo='';
+  try{
+    if(sb&&usuario&&usuario.uid){
+      if(file){ archivo=usuario.uid+'/'+pagoCod+'-'+Date.now()+'.'+((file.name.split('.').pop()||'jpg').toLowerCase()); const up=await sb.storage.from('comprobantes').upload(archivo,file); if(up.error) archivo=''; }
+      const {data,error}=await sb.rpc('registrar_pago',{cod:pagoCod,metodo:pagoMetodo,ref,archivo,monto:o.pago1||0});
+      if(error||data===false) throw error||new Error('no');
+    }
+  }catch(e){ btn.disabled=false; btn.textContent='Ya pagué'; toast('No se pudo enviar. Intenta de nuevo o escríbele a tu asesor.'); return; }
+  o.pago={metodo:pagoMetodo,referencia:ref,monto:o.pago1||0,estado:'Por verificar'}; guardar();
+  avisarAnyi('Pago recibido '+pagoCod+' · '+usd(o.pago1||0),{Orden:pagoCod,'Vehículo':o.nom,Monto:usd(o.pago1||0),'Método':pagoMetodo,'Confirmación':ref||'—',Comprobante:archivo?'Subido (ver en tu Panel)':'No subió foto',Cliente:usuario?usuario.nombre:'',WhatsApp:usuario?usuario.wa:''});
+  $('#v-pagar').innerHTML=`<section style="padding-top:70px;text-align:center"><div style="width:76px;height:76px;border-radius:50%;background:var(--gold);margin:0 auto 18px;display:flex;align-items:center;justify-content:center"><svg width="36" height="36" fill="none" stroke="#0B1F3F" stroke-width="3"><path d="M8 18l7 7 13-14"/></svg></div>
+    <h2 style="font-family:var(--serif);color:var(--navy);font-size:24px">¡Recibimos tu pago!</h2>
+    <p style="color:var(--muted);font-size:14px;line-height:1.5;margin:10px 24px 24px">Lo verificamos y tu asesor te escribe por WhatsApp para arrancar con tu ${esc(o.nom)}.</p>
+    <button class="btn gold" onclick="irA('ordenes')">Ver mi orden</button></section>`;
+  const st=$('.sticky'); if(st) st.remove();
+}
+async function verComprobante(path){ const {data,error}=await sb.storage.from('comprobantes').createSignedUrl(path,600); if(error||!data){toast('No se pudo abrir');return} window.open(data.signedUrl,'_blank'); }
 async function cancelarOrden(cod){
   const o=ordenes.find(x=>x.cod===cod); if(!o) return;
   if(!confirm('¿Seguro que quieres cancelar la orden '+cod+'?')) return;
@@ -1085,7 +1148,8 @@ async function pintarPanel(){
   const tabs=`<div class="seg">${[['ordenes','Órdenes ('+O.length+')'],['flotillas','Flotillas ('+F.length+')'],['clientes','Clientes ('+P.length+')']].map(([k,n])=>`<button class="${panelTab===k?'on':''}" onclick="panelTab='${k}';pintarPanel()">${n}</button>`).join('')}</div>`;
   let h='';
   if(panelTab==='ordenes') h=O.map(x=>{const c=per[x.user_id]||{}, d=x.detalle||{}; return `<div class="box" ${x.paso===0?'style="opacity:.55"':''}><h3>${esc(x.vehiculo)}</h3><div style="font-size:12px;color:var(--muted);margin:-6px 0 10px">Orden ${esc(x.codigo)} · ${new Date(x.creado).toLocaleDateString('es-VE')}</div>
-    <div style="font-size:13px;line-height:1.6"><b>${esc(c.nombre||d.cliente)}</b> · ${esc(c.correo)}<br>${wa(d.whatsapp||c.whatsapp)} · Vive en ${esc(d.ciudad||c.ciudad||'—')}<br>${d.lote?'Lote '+esc(d.lote)+' · ':''}${d.vin?'VIN '+esc(d.vin)+' · ':''}${d.precio?usd(d.precio):''}${d.prefs?'<br>Cómo la quiere: '+esc(d.prefs):''}${d.extras&&d.extras.length?'<br>Servicios: '+esc(d.extras.join(', ')):''}</div>
+    <div style="font-size:13px;line-height:1.6"><b>${esc(c.nombre||d.cliente)}</b> · ${esc(c.correo)}<br>${wa(d.whatsapp||c.whatsapp)} · Vive en ${esc(d.ciudad||c.ciudad||'—')}<br>${d.lote?'Lote '+esc(d.lote)+' · ':''}${d.vin?'VIN '+esc(d.vin)+' · ':''}${d.precio?usd(d.precio):''}${d.prefs?'<br>Cómo la quiere: '+esc(d.prefs):''}${d.extras&&d.extras.length?'<br>Servicios: '+esc(d.extras.join(', ')):''}${d.pago1?'<br>Pago 1: '+usd(d.pago1):''}</div>
+    ${d.pago?`<div style="background:#FFF9EC;border:1px solid var(--gold);border-radius:12px;padding:10px 12px;font-size:13px;margin-top:10px"><b>Pagó ${usd(d.pago.monto||0)} por ${esc(d.pago.metodo)}</b><br>Confirmación: ${esc(d.pago.referencia||'—')}${d.pago.archivo?`<br><a style="color:var(--blue);font-weight:700;cursor:pointer" onclick="verComprobante('${esc(d.pago.archivo)}')">Ver comprobante</a>`:''}</div>`:''}
     <div class="field" style="margin:12px 0 0"><label>Etapa que ve el cliente</label><select onchange="cambiarPaso(${x.id},this.value)"><option value="0" ${x.paso===0?'selected':''}>Cancelada</option>${PASOS.map((s,i)=>`<option value="${i+1}" ${x.paso===i+1?'selected':''}>${etapa(i+1)}</option>`).join('')}</select></div></div>`}).join('')||'<div class="empty">Todavía no hay órdenes.</div>';
   else if(panelTab==='flotillas') h=F.map(x=>`<div class="box"><h3>${esc(x.empresa)} · ${esc(x.cantidad)} unidades</h3><div style="font-size:12px;color:var(--muted);margin:-6px 0 10px">${esc(x.codigo)} · ${new Date(x.creado).toLocaleDateString('es-VE')}</div>
     <div style="font-size:13px;line-height:1.6">${esc(x.nombre)} · ${esc(x.tipo)}<br>${wa(x.whatsapp)}<br>Modelos: ${esc(x.modelos)}${x.presupuesto?'<br>Presupuesto: $'+esc(x.presupuesto)+' por unidad':''}<br>Recibe en ${esc(x.destino)} · ${esc(x.cuando)}</div>
