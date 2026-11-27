@@ -1363,7 +1363,7 @@ function copiarLink(){ const u='https://importa2desdeusa.github.io/'; try{naviga
 window.addEventListener('appinstalled',()=>{ const p=$('#instPill'); if(p) p.style.display='none'; });
 if(esApp()){ const p=$('#instPill'); if(p) p.style.display='none'; }
 else setTimeout(()=>{ let t=0; try{t=+localStorage.getItem('i2inst')||0}catch(e){} if(Date.now()-t<3*D) return; if(!$('.modal.on')) abrirInstalar(); },5500);
-if('serviceWorker' in navigator && /github\.io$/.test(location.hostname)) navigator.serviceWorker.register('sw.js').catch(()=>{});
+if('serviceWorker' in navigator && /github\.io$/.test(location.hostname)) navigator.serviceWorker.register('sw.js',{updateViaCache:'none'}).then(r=>r.update()).catch(()=>{});
 try{ history.replaceState({v:'inicio'},''); }catch(e){}
 pintarCats(); pintarMarcas(); refrescar(); cargarCuenta();
 /* cintillo: imagen animada que se reproduce una vez al verse y queda fija */
