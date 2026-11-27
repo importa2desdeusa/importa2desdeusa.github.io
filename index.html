@@ -73,6 +73,9 @@ section{padding:20px 20px 0}
 .cats{display:grid;gap:10px}
 .cat{display:flex;align-items:center;gap:14px;background:#fff;border:1.5px solid var(--line);border-radius:18px;padding:16px;text-align:left;width:100%}
 .cat.on{border-color:var(--gold);background:var(--navy);color:#fff}
+.cat .ci.lux{flex:0 0 58px;height:58px;border-radius:16px;background:radial-gradient(circle at 35% 30%,#1f4f9e,#0B1F3F 72%);display:grid;place-items:center;box-shadow:0 6px 14px rgba(11,31,63,.25),inset 0 0 0 1.5px rgba(242,201,76,.55)}
+.cat .ci.foto{flex:0 0 78px;height:56px;border-radius:12px;background:#0B1F3F center/cover no-repeat;box-shadow:0 4px 10px rgba(11,31,63,.18)}
+.cat{padding:10px 14px 10px 10px!important}
 .cat .ci{flex:0 0 46px;height:46px;border-radius:14px;background:#EEF2FA;display:grid;place-items:center}
 .cat.on .ci{background:rgba(255,255,255,.1)}
 .cat b{display:block;font-size:16px;color:inherit}
@@ -779,6 +782,7 @@ let filtroCat=null;
   var S={};
   try{ S=JSON.parse(document.getElementById('tc-state').textContent)||{}; }catch(e){ S={}; }
   (S.cars||[]).forEach(function(v){
+    if(v.cierra&&v.cierra<Date.now()) return;
     CAMIONETAS.push({
       id:_id++, cat: v.rubro==='Subasta'?'publica':'conces',
       marca:v.marca, mod:v.mod, an:v.an, img:v.foto||null,
@@ -855,17 +859,17 @@ function card(c){
       ${c.img?'<span class="ref">Foto referencial</span>':''}
     </div>
     <div class="cb"><h4>${c.an} ${c.marca} ${c.mod}</h4><div class="meta">${c.cat==='publica'?`Lote ${c.lote} · ${c.lugar} · ${c.mi}`:c.cat==='privada'?'Manheim, ADESA y más · '+c.trac:`${c.lugar} · ${c.trac}`}</div>
-      <div class="pr"><div><small>${c.cat==='publica'?(c.firme?'Compra inmediata':'Puja actual'):c.aprox?'Desde aprox. (se cotiza)':'Precio de referencia'}</small><b>${c.puja?usd(c.puja):c.aprox?usd(c.aprox):'Se cotiza'}</b></div>
+      <div class="pr"><div><small>${c.cat==='publica'?'Precio hoy en '+c.sub:c.aprox?'Desde aprox. (se cotiza)':'Precio de referencia'}</small><b>${c.puja?usd(c.puja):c.aprox?usd(c.aprox):'Se cotiza'}</b></div>
       <div class="lock">${usuario?'Ver total puesta<br>en Venezuela →':'Crea tu cuenta para ver<br>el total en Venezuela'}</div></div></div></div>`;
 }
 function heart(on){return `<svg width="18" height="18" fill="${on?'#C9A24A':'none'}" stroke="${on?'#C9A24A':'#0B1F3F'}" stroke-width="1.8"><path d="M9 15.5s-6-3.8-6-8.1A3.4 3.4 0 019 5.6a3.4 3.4 0 016 1.8c0 4.3-6 8.1-6 8.1z"/></svg>`}
-function lista(q,todas){ q=(q||'').toLowerCase(); return CAMIONETAS.filter(c=>(todas||c.cat===filtroCat)&&(filtroMarca==='todas'||c.marca===filtroMarca)&&(`${c.an} ${c.marca} ${c.mod}`.toLowerCase().includes(q))); }
-function pintarCats(){ const ic={publica:'<svg width="22" height="22" fill="none" stroke="#C9A24A" stroke-width="1.8"><path d="M4 18h10M6 14l6-6M9 5l5 5M11 3l6 6"/></svg>',privada:'<svg width="22" height="22" fill="none" stroke="#C9A24A" stroke-width="1.8"><rect x="4" y="9" width="14" height="10" rx="2"/><path d="M7 9V6a4 4 0 018 0v3"/></svg>',conces:'<svg width="22" height="22" fill="none" stroke="#C9A24A" stroke-width="1.8"><path d="M3 19V9l8-5 8 5v10"/><path d="M7 19v-5h8v5"/></svg>',flotas:'<svg width="22" height="22" fill="none" stroke="#C9A24A" stroke-width="1.8"><path d="M2 15v-3l2-4h7l2 4v3z"/><circle cx="5" cy="15.5" r="1.5"/><circle cx="10" cy="15.5" r="1.5"/><path d="M9 8l1.5-3h7l2 4v3h-6"/><circle cx="17" cy="12.5" r="1.5"/></svg>'}; $('#cats').innerHTML=CATS.map(c=>c.id==='flotas'?`<button class="cat" style="border-color:var(--gold)" onclick="irA('flotas')"><div class="ci">${ic[c.id]}</div><div><b>${c.n}</b><small>${c.d}</small></div><span class="arr">›</span></button>`:`<button class="cat ${filtroCat===c.id?'on':''}" onclick="filtroCat='${c.id}';filtroMarca='todas';pintarMarcas();irA('buscar')"><div class="ci">${ic[c.id]}</div><div><b>${c.n}</b><small>${c.d}</small></div><span class="arr">›</span></button>`).join(''); }
+function lista(q,todas){ q=(q||'').toLowerCase(); return CAMIONETAS.filter(c=>!(c.cierra&&c.cierra<Date.now())&&(todas||c.cat===filtroCat)&&(filtroMarca==='todas'||c.marca===filtroMarca)&&(`${c.an} ${c.marca} ${c.mod}`.toLowerCase().includes(q))); }
+function pintarCats(){ const ic={publica:'<div class="ci lux"><svg width="34" height="34" viewBox="0 0 34 34"><defs><linearGradient id="gg1" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFE9A3"/><stop offset=".5" stop-color="#F2C94C"/><stop offset="1" stop-color="#C8901E"/></linearGradient></defs><g transform="rotate(-40 17 17)"><rect x="9" y="6" width="16" height="8" rx="2.5" fill="url(#gg1)"/><rect x="7.5" y="5" width="3" height="10" rx="1.2" fill="url(#gg1)"/><rect x="23.5" y="5" width="3" height="10" rx="1.2" fill="url(#gg1)"/><rect x="15.6" y="13" width="2.8" height="14" rx="1.2" fill="url(#gg1)"/></g><rect x="5" y="27" width="16" height="3.2" rx="1.4" fill="url(#gg1)"/><path d="M24 22l4-2M25 26.5h4.5M23 18l2.5-3.5" stroke="#F2C94C" stroke-width="1.8" stroke-linecap="round"/></svg></div>',privada:'<div class="ci lux"><svg width="34" height="34" viewBox="0 0 34 34"><defs><linearGradient id="gg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFE9A3"/><stop offset=".5" stop-color="#F2C94C"/><stop offset="1" stop-color="#C8901E"/></linearGradient></defs><circle cx="11.5" cy="12.5" r="7" fill="none" stroke="url(#gg1)" stroke-width="3.2"/><circle cx="11.5" cy="12.5" r="2.2" fill="url(#gg1)"/><path d="M16.5 17.5L28 29" stroke="url(#gg1)" stroke-width="3.4" stroke-linecap="round"/><path d="M23.5 24.5l2.6-2.6M26.3 27.3l2.6-2.6" stroke="url(#gg1)" stroke-width="3" stroke-linecap="round"/><path d="M25 5l1 2.2 2.4.3-1.8 1.6.5 2.4-2.1-1.2-2.1 1.2.5-2.4-1.8-1.6 2.4-.3z" fill="#FFE9A3"/></svg></div>',conces:'<div class="ci lux"><svg width="34" height="34" viewBox="0 0 34 34"><defs><linearGradient id="gg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFE9A3"/><stop offset=".5" stop-color="#F2C94C"/><stop offset="1" stop-color="#C8901E"/></linearGradient></defs><path d="M4 12L17 5l13 7" fill="none" stroke="url(#gg1)" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M6.5 12.5V29M27.5 12.5V29" stroke="url(#gg1)" stroke-width="2.6" stroke-linecap="round"/><path d="M9 25.5v-3.2l2-4.2h12l2 4.2v3.2z" fill="url(#gg1)"/><circle cx="12.5" cy="26" r="2" fill="#0B1F3F" stroke="url(#gg1)" stroke-width="1.4"/><circle cx="21.5" cy="26" r="2" fill="#0B1F3F" stroke="url(#gg1)" stroke-width="1.4"/><path d="M12.6 21.2h8.8" stroke="#0B1F3F" stroke-width="1.3"/><path d="M4 30h26" stroke="url(#gg1)" stroke-width="2.6" stroke-linecap="round"/></svg></div>',flotas:''}; $('#cats').innerHTML=CATS.map(c=>c.id==='flotas'?`<button class="cat" style="border-color:var(--gold)" onclick="irA('flotas')">${ic[c.id]}<div><b>${c.n}</b><small>${c.d}</small></div><span class="arr">›</span></button>`:`<button class="cat ${filtroCat===c.id?'on':''}" onclick="filtroCat='${c.id}';filtroMarca='todas';pintarMarcas();irA('buscar')">${ic[c.id]}<div><b>${c.n}</b><small>${c.d}</small></div><span class="arr">›</span></button>`).join(''); }
 function filtrar(){}
 function irBuscar(){ const q=$('#q').value; filtroCat=null; irA('buscar'); const i=$('#q2'); i.value=q; pintarBuscar(); i.focus(); $('#q').value=''; }
 function pintarBuscar(){ const q=$('#q2').value; let h='';
   if(filtroMarca!=='todas') h+=`<section style="padding-bottom:0"><button class="fchip" onclick="filtroMarca='todas';pintarMarcas();pintarBuscar()">Solo ${filtroMarca} ✕</button></section>`;
-  CATS.filter(c=>c.id!=='flotas').sort((a,b)=>(b.id===filtroCat)-(a.id===filtroCat)).forEach(cat=>{ const l=CAMIONETAS.filter(c=>c.cat===cat.id&&(filtroMarca==='todas'||c.marca===filtroMarca)&&`${c.an} ${c.marca} ${c.mod}`.toLowerCase().includes(q.toLowerCase())); if(!l.length) return;
+  CATS.filter(c=>c.id!=='flotas').sort((a,b)=>(b.id===filtroCat)-(a.id===filtroCat)).forEach(cat=>{ const l=CAMIONETAS.filter(c=>!(c.cierra&&c.cierra<Date.now())&&c.cat===cat.id&&(filtroMarca==='todas'||c.marca===filtroMarca)&&`${c.an} ${c.marca} ${c.mod}`.toLowerCase().includes(q.toLowerCase())); if(!l.length) return;
     h+=`<section style="padding-bottom:4px" id="row-${cat.id}"><div class="h"><h2 style="font-size:18px">${cat.n} <span style="font-size:12px;color:var(--muted);font-family:var(--sans)">(${l.length})</span></h2>${l.length>3?'<span class="desl">Desliza para ver más ›</span>':''}</div><div class="miniw"><div class="mini" onscroll="this.parentNode.classList.toggle('fin',this.scrollLeft+this.clientWidth>=this.scrollWidth-4)">${l.map(mini).join('')}</div>${l.length>3?'<button class="mflecha" onclick="this.previousElementSibling.scrollBy({left:this.previousElementSibling.clientWidth*.9,behavior:\'smooth\'})" aria-label="Ver más">›</button>':''}</div></section>`; });
   $('#gridBuscar').innerHTML=h||'<section><div class="empty">No la tenemos cargada. Escríbenos y te la buscamos.</div></section>'; }
 function mini(c){ return `<div class="mc" onclick="ficha(${c.id})"><div class="mp" style="${c.img?`background-image:url(${c.img}?v=2)`:''}"></div><div class="mt"><b>${c.an} ${c.marca}</b><span>${c.mod}</span><em>${c.puja?usd(c.puja):c.aprox?'Aprox. '+usd(c.aprox):'Se cotiza'}</em></div></div>`; }
@@ -953,6 +957,8 @@ function ficha(id){
 
     <div class="box"><h3>Cómo funciona ${c.cat==='conces'?'en concesionario':'en subasta'}</h3>${comoFunciona(c.cat)}</div>
 
+    <div class="box" style="border:1.5px solid var(--gold)"><h3>Equípalo a tu gusto</h3><p style="font-size:13px;color:var(--muted);line-height:1.5">En el siguiente paso escoges qué le instalamos en Estados Unidos y qué en Venezuela: car audio RM Pro, pantalla CarPlay, luces, cauchos, rines y más.</p></div>
+
     <div class="box"><h3>Información clave</h3><div class="specs">
       <div><small>Año</small><b>${c.an}</b></div><div><small>Motor</small><b>${c.motor}</b></div>
       <div><small>Millas</small><b>${c.mi}</b></div><div><small>Daño</small><b>${c.dano}</b></div><div><small>Ubicación</small><b>${c.lugar}</b></div><div><small>Tracción</small><b>${c.trac}</b></div>
@@ -962,7 +968,8 @@ function ficha(id){
     <div class="box calc"><h3>¿Cuánto te sale tu camioneta?</h3>
       <div class="lockbox ${usuario?'':'locked'}" id="lock">
         <div class="res">
-          ${(c.cat!=='conces'||!c.puja)?`<div class="field"><label>${c.cat==='publica'?'Tu puja aproximada (USD)':'Precio aproximado que quieres pagar (USD)'}</label><input id="cPuja" type="number" inputmode="numeric" value="${c.puja||c.aprox||''}" placeholder="Ej. 40000" oninput="calcular()"></div>`:''}
+          ${c.cat==='publica'&&c.puja?`<p style="font-size:13px;color:var(--muted);margin:0 0 10px">Precio que muestra ${esc(c.sub)} hoy: <b style="color:var(--navy)">${usd(c.puja)}</b>. No es el precio final: en la subasta casi siempre termina más alto.</p>`:''}
+          ${(c.cat!=='conces'||!c.puja)?`<div class="field"><label>${c.cat==='publica'?'¿Hasta cuánto quieres pujar? (USD)':'Precio aproximado que quieres pagar (USD)'}</label><input id="cPuja" type="number" inputmode="numeric" value="${c.cat==='publica'?'':(c.aprox||'')}" placeholder="Ej. 40000" oninput="calcular()"></div>`:''}
           <div class="field"><label>¿Dónde la recibes?</label><select id="cDest" onchange="calcular()">
             <option value="tierra" ${usuario&&usuario.ciudad==='Margarita'?'':'selected'}>Tierra firme (Caracas y resto del país)</option>
             <option value="margarita" ${usuario&&usuario.ciudad==='Margarita'?'selected':''}>Margarita</option>
@@ -988,7 +995,7 @@ function ficha(id){
     <div class="box"><h3>Por qué con Importa2</h3>
       <div class="extra" style="border:0;padding:4px 0">✓&nbsp; Oficinas en St. Cloud, Caracas y Margarita</div>
       <div class="extra" style="border:0;padding:4px 0">✓&nbsp; Compramos contigo, no por ti a ciegas</div>
-      <div class="extra" style="border:0;padding:4px 0">✓&nbsp; Nacionalización con nuestros agentes aduanales</div>
+      <div class="extra" style="border:0;padding:4px 0">✓&nbsp; Nacionalización con nuestros agentes aduanales o con los de tu confianza</div>
       <div class="extra" style="border:0;padding:4px 0">✓&nbsp; Rastreo de tu camioneta hasta tu puerta</div>
     </div>
     <div style="height:30px"></div>
@@ -997,7 +1004,7 @@ function ficha(id){
   $('#nav').style.display='none';
   const old=$('.sticky'); if(old) old.remove();
   const st=document.createElement('div'); st.className='sticky';
-  st.innerHTML=`<div><small>${c.cat==='publica'?(c.firme?'Compra inmediata':'Puja actual'):c.aprox?'Desde aprox. (se cotiza)':'Precio de referencia'}</small><b>${c.puja?usd(c.puja):c.aprox?usd(c.aprox):'Se cotiza'}</b></div><button class="btn gold" onclick="resumen()">${c.cat==='privada'?'Pedir esta camioneta ›':'Comprar ›'}</button>`;
+  st.innerHTML=`<div><small>${c.cat==='publica'?'Precio hoy en '+c.sub:c.aprox?'Desde aprox. (se cotiza)':'Precio de referencia'}</small><b>${c.puja?usd(c.puja):c.aprox?usd(c.aprox):'Se cotiza'}</b></div><button class="btn gold" onclick="resumen()">${c.cat==='privada'?'Pedir esta camioneta ›':'Comprar ›'}</button>`;
   document.body.appendChild(st);
   if(carrito&&carrito.c.id===id){ const f=carrito.f||{}; Object.keys(f).forEach(k=>{const e=document.getElementById(k); if(e) e.value=f[k];}); }
   calcular(); clearInterval(timerInt); if(c.cierra){tick();timerInt=setInterval(tick,1000)}
@@ -1017,6 +1024,7 @@ function resumen(){
   if($('#v-ficha').classList.contains('on')){
     const f={}; ['pCol1','pCol2','pVer','pTrac','pAnio','pMi','pNota','cPuja','cDest','cCiu'].forEach(k=>{const e=document.getElementById(k); if(e) f[k]=e.value;});
     const sub=c.cat!=='conces', puja=f.cPuja!=null?(+f.cPuja||0):(c.puja||0);
+    if(c.cat==='publica'&&!puja){ toast('Escribe hasta cuánto quieres pujar'); const e=$('#cPuja'); if(e){e.focus();e.scrollIntoView({block:'center'});} return; }
     const total=puja?puja+(sub?feeSubasta(puja)+COSTOS.broker:0)+(sub?COSTOS.servicioSubasta:COSTOS.servicioConces)+(f.cDest==='margarita'?COSTOS.envioMargarita:COSTOS.envioTierra):0;
     const envioK=f.cDest==='margarita'?COSTOS.envioMargarita:COSTOS.envioTierra;
     carrito={c,f,pr:prefs(),puja,total,pago1:total?total-envioK:0,dest:f.cDest==='margarita'?'Margarita':f.cDest==='otra'?(f.cCiu||'otra ciudad'):'tierra firme',ex:(carrito&&carrito.c.id===c.id?carrito.ex:[]),modo:(carrito&&carrito.c.id===c.id?carrito.modo:{})};
@@ -1071,7 +1079,7 @@ function calcular(){
   const c=actual; if(!c) return;
   const sub=c.cat!=='conces';
   const puja=$('#cPuja')?(+$('#cPuja').value||0):c.puja;
-  const com=sub?feeSubasta(puja):0; if(!puja){$('#lines').innerHTML='<div class="calc note" style="font-size:13px;color:var(--muted)">Escribe un precio aproximado y te sale el total con el envío incluido.</div>';return}
+  const com=sub?feeSubasta(puja):0; if(!puja){$('#lines').innerHTML='<div class="calc note" style="font-size:13px;color:var(--muted)">'+(c.cat==='publica'?'Escribe hasta cuánto quieres pujar y te sale el total con el envío incluido.':'Escribe un precio aproximado y te sale el total con el envío incluido.')+'</div>';return}
   const serv=sub?COSTOS.servicioSubasta:COSTOS.servicioConces;
   const dest=$('#cDest')?$('#cDest').value:'tierra'; if($('#cCiuBox')) $('#cCiuBox').style.display=dest==='otra'?'':'none';
   const envio=dest==='margarita'?COSTOS.envioMargarita:COSTOS.envioTierra;
