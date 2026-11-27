@@ -243,6 +243,11 @@ nav .wa svg{stroke:#1FA855}
 .btn{display:block;width:100%;text-align:center;background:var(--navy);color:#fff;border-radius:14px;padding:14px;font-weight:700;font-size:15px}
 .btn.gold{background:var(--gold);color:var(--navy)}
 .btn.line{background:#fff;border:1.5px solid var(--navy);color:var(--navy)}
+.svcs{display:grid;gap:10px}
+.svc{display:flex;align-items:center;gap:10px;width:100%;text-align:left;background:#fff;border:1.5px solid var(--line);border-radius:14px;padding:12px 14px;font-size:14px;color:var(--navy)}
+.svc div{flex:1}.svc small{display:block;color:var(--muted);font-size:12px;margin-top:2px;font-weight:400}
+.svc .add{flex:none;font-size:12.5px;font-weight:700;color:var(--navy);background:var(--bg);border-radius:20px;padding:7px 12px}
+.svc.on{border-color:var(--gold);background:#FFF9EC}.svc.on .add{background:var(--gold);color:var(--navy)}
 .extra{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--line);font-size:14px}
 .extra:last-child{border:0}
 .extra input{width:20px;height:20px;accent-color:var(--navy)}
@@ -532,7 +537,7 @@ nav .wa svg{stroke:#1FA855}
 <!-- FLOTILLAS -->
 <div class="view" id="v-flotas">
   <div class="top">
-    <div class="top-row"><button class="iconbtn" onclick="irA('inicio')" aria-label="Volver"><svg width="18" height="18" fill="none" stroke="#fff" stroke-width="2"><path d="M11 4L6 9l5 5"/></svg></button></div>
+    <div class="top-row"><button class="iconbtn" onclick="atras()" aria-label="Volver"><svg width="18" height="18" fill="none" stroke="#fff" stroke-width="2"><path d="M11 4L6 9l5 5"/></svg></button></div>
     <div class="hello" style="margin-top:10px"><small>Para empresas</small><span>Flotillas y empresas</span></div>
     <p style="margin-top:10px;font-size:12.5px;color:#A9B6CF;line-height:1.5">Para rent a car, concesionarios, revendedores y empresas que compran varias camionetas. Te armamos una cotización a la medida de tu negocio.</p>
   </div>
@@ -569,7 +574,7 @@ nav .wa svg{stroke:#1FA855}
 <!-- PANEL -->
 <div class="view" id="v-panel">
   <div class="top">
-    <div class="top-row"><button class="iconbtn" onclick="irA('perfil')" aria-label="Volver"><svg width="18" height="18" fill="none" stroke="#fff" stroke-width="2"><path d="M11 4L6 9l5 5"/></svg></button></div>
+    <div class="top-row"><button class="iconbtn" onclick="atras()" aria-label="Volver"><svg width="18" height="18" fill="none" stroke="#fff" stroke-width="2"><path d="M11 4L6 9l5 5"/></svg></button></div>
     <div class="hello" style="margin-top:10px"><small>Solo para Importa2</small><span>Mi panel</span></div>
   </div>
   <section id="panelBox"></section>
@@ -579,7 +584,7 @@ nav .wa svg{stroke:#1FA855}
 <!-- LEGAL -->
 <div class="view" id="v-legal">
   <div class="top">
-    <div class="top-row"><button class="iconbtn" onclick="irA('inicio')" aria-label="Volver"><svg width="18" height="18" fill="none" stroke="#fff" stroke-width="2"><path d="M11 4L6 9l5 5"/></svg></button></div>
+    <div class="top-row"><button class="iconbtn" onclick="atras()" aria-label="Volver"><svg width="18" height="18" fill="none" stroke="#fff" stroke-width="2"><path d="M11 4L6 9l5 5"/></svg></button></div>
     <div class="hello" style="margin-top:10px"><small>Última actualización: 26 de noviembre de 2026</small><span>Términos y privacidad</span></div>
   </div>
   <section class="legal">
@@ -639,6 +644,7 @@ nav .wa svg{stroke:#1FA855}
 
 <!-- FICHA -->
 <div class="view ficha" id="v-ficha"></div>
+<div class="view" id="v-resumen"></div>
 
 <nav id="nav">
   <button class="on" data-v="inicio" onclick="irA('inicio')"><svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 10l8-6 8 6v9H3z"/><path d="M9 19v-5h4v5"/></svg>Inicio</button>
@@ -811,7 +817,18 @@ function pintarBuscar(){ const l=lista($('#q2').value,true); $('#gridBuscar').in
 function pintarFavs(){ const l=CAMIONETAS.filter(c=>favs.has(c.id)); $('#gridFavs').innerHTML=l.length?l.map(card).join(''):'<div class="empty">Toca el corazón de una camioneta para guardarla aquí. Te avisamos antes de que cierre.</div>'; }
 function toggleFav(id){ if(!usuario){abrir('registro');return} favs.has(id)?favs.delete(id):favs.add(id); guardar(); refrescar(); toast(favs.has(id)?'Guardada en Me gusta':'Quitada de Me gusta'); }
 
+let navDepth=0, enPop=false;
+function marcar(st){ if(enPop) return; try{ if(JSON.stringify(history.state)===JSON.stringify(st)) return; history.pushState(st,''); navDepth++; }catch(e){} }
+function atras(){ if(navDepth>0) history.back(); else irA('inicio'); }
+window.addEventListener('popstate',e=>{
+  enPop=true; navDepth=Math.max(0,navDepth-1);
+  document.querySelectorAll('.modal.on').forEach(m=>m.classList.remove('on'));
+  const s=e.state||{v:'inicio'};
+  try{ if(s.f) ficha(s.f); else if(s.r&&actual) resumen(); else irA(s.v||'inicio'); }catch(err){ irA('inicio'); }
+  enPop=false;
+});
 function irA(v){
+  marcar({v});
   document.querySelectorAll('.view').forEach(x=>x.classList.remove('on'));
   $('#v-'+v).classList.add('on');
   document.querySelectorAll('nav button[data-v]').forEach(b=>b.classList.toggle('on',b.dataset.v===v));
@@ -840,11 +857,13 @@ const EXTRAS=[
   {id:'grua',n:'Grúa hasta tu casa',d:'Después de la aduana',p:null}
 ];
 function ficha(id){
-  const c=CAMIONETAS.find(x=>x.id===id); actual=c;
+  const c=CAMIONETAS.find(x=>x.id===id); if(!c){irA('inicio');return}
+  if(!actual||actual.id!==id) carrito=null;
+  actual=c; marcar({f:id});
   const v=$('#v-ficha');
   v.innerHTML=`
   <div class="gal ${c.img?'':'noimg'}" style="${c.img?`background-image:url(${c.img}?v=2)`:''}">${c.img?'':`<div class="pend">${SIL}<br>Foto por cargar</div>`}
-    <button class="back" onclick="irA('inicio')"><svg width="18" height="18" fill="none" stroke="#0B1F3F" stroke-width="2"><path d="M11 4L6 9l5 5"/></svg></button>
+    <button class="back" onclick="atras()"><svg width="18" height="18" fill="none" stroke="#0B1F3F" stroke-width="2"><path d="M11 4L6 9l5 5"/></svg></button>
     <button class="fav" style="top:14px;right:14px;width:40px;height:40px" onclick="toggleFav(${c.id})">${heart(favs.has(c.id))}</button>
     ${c.img?'<span class="cnt">Foto referencial</span>':''}
   </div>
@@ -888,17 +907,6 @@ function ficha(id){
       <div class="field" style="margin-bottom:0"><label>Algo más que quieras (opcional)</label><input id="pNota" placeholder="Ej. techo solar, asientos de cuero"></div>
     </div>`:''}
 
-    <div class="box"><h3>¿Cómo te contactamos?</h3>
-      <p style="font-size:12.5px;color:var(--muted);margin:-4px 0 12px;line-height:1.45">Tu asesor te escribe a este número para seguir con tu orden.</p>
-      <div class="field"><label>Tu nombre</label><input id="oNom" value="${usuario?esc(usuario.nombre):''}" autocomplete="name"></div>
-      <div class="field"><label>WhatsApp</label><input id="oWa" type="tel" value="${usuario?esc(usuario.wa||''):''}" placeholder="+58 4xx xxx xxxx" autocomplete="tel"></div>
-      <div class="field" style="margin-bottom:0"><label>¿Dónde vives?</label><input id="oCiu" value="${usuario&&usuario.ciudad&&usuario.ciudad!=='—'?esc(usuario.ciudad):''}" placeholder="Ej. Caracas, Valencia, Porlamar"></div>
-    </div>
-
-    <div class="box"><h3>Servicios adicionales</h3>
-      ${EXTRAS.map(e=>`<label class="extra"><input type="checkbox" value="${e.id}"><div>${e.n}<small>${e.d} · se cotiza con tu asesor</small></div></label>`).join('')}
-    </div>
-
     <div class="box"><h3>Por qué con Importa2</h3>
       <div class="extra" style="border:0;padding:4px 0">✓&nbsp; Oficinas en St. Cloud, Caracas y Margarita</div>
       <div class="extra" style="border:0;padding:4px 0">✓&nbsp; Compramos contigo, no por ti a ciegas</div>
@@ -909,12 +917,57 @@ function ficha(id){
   </div>`;
   document.querySelectorAll('.view').forEach(x=>x.classList.remove('on')); v.classList.add('on');
   $('#nav').style.display='none';
+  const old=$('.sticky'); if(old) old.remove();
   const st=document.createElement('div'); st.className='sticky';
-  st.innerHTML=`<div><small>${c.cat==='publica'?(c.firme?'Compra inmediata':'Puja actual'):'Precio'}</small><b>${c.puja?usd(c.puja):'Se cotiza'}</b></div><button class="btn gold" onclick="comprar()">${c.cat==='privada'?'Pedir esta camioneta':'Generar orden'}</button>`;
+  st.innerHTML=`<div><small>${c.cat==='publica'?(c.firme?'Compra inmediata':'Puja actual'):'Precio'}</small><b>${c.puja?usd(c.puja):'Se cotiza'}</b></div><button class="btn gold" onclick="resumen()">${c.cat==='privada'?'Pedir esta camioneta ›':'Comprar ›'}</button>`;
   document.body.appendChild(st);
+  if(carrito&&carrito.c.id===id){ const f=carrito.f||{}; Object.keys(f).forEach(k=>{const e=document.getElementById(k); if(e) e.value=f[k];}); }
   calcular(); clearInterval(timerInt); if(c.cierra){tick();timerInt=setInterval(tick,1000)}
   window.scrollTo(0,0);
 }
+/* ===== RESUMEN DE COMPRA (paso 2, como un carrito) ===== */
+let carrito=null;
+function resumen(){
+  const c=actual; if(!c) return;
+  if(!usuario){abrir('registro');return}
+  if($('#v-ficha').classList.contains('on')){
+    const f={}; ['pCol1','pCol2','pVer','pTrac','pAnio','pMi','pNota','cPuja','cDest'].forEach(k=>{const e=document.getElementById(k); if(e) f[k]=e.value;});
+    const sub=c.cat!=='conces', puja=f.cPuja!=null?(+f.cPuja||0):(c.puja||0);
+    const total=puja?puja+(sub?feeSubasta(puja)+COSTOS.broker:0)+(sub?COSTOS.servicioSubasta:COSTOS.servicioConces)+(f.cDest==='margarita'?COSTOS.envioMargarita:COSTOS.envioTierra):0;
+    carrito={c,f,pr:prefs(),puja,total,dest:f.cDest==='margarita'?'Margarita':'tierra firme',ex:(carrito&&carrito.c.id===c.id?carrito.ex:[])};
+  }
+  if(!carrito) return;
+  marcar({r:1});
+  const k=carrito, v=$('#v-resumen');
+  v.innerHTML=`<div class="top"><div class="top-row"><button class="iconbtn" onclick="atras()" aria-label="Volver"><svg width="18" height="18" fill="none" stroke="#fff" stroke-width="2"><path d="M11 4L6 9l5 5"/></svg></button></div><div class="hello" style="margin-top:10px"><small>Revisa, agrega lo que quieras y confirma</small><span>Tu orden</span></div></div>
+  <section>
+    <div class="box"><div style="display:flex;gap:12px;align-items:center">
+      <div style="width:84px;height:62px;border-radius:10px;flex:none;background:#E9EDF3 ${c.img?`url(${c.img}?v=2) center/cover`:''}"></div>
+      <div><b style="font-size:15px;color:var(--navy)">${c.an} ${c.marca} ${c.mod}</b><div style="font-size:12px;color:var(--muted);margin-top:2px">${c.cat==='publica'?'Subasta pública · lote '+c.lote:c.cat==='privada'?'Subasta privada · por encargo':'Concesionario · 0 km'}</div></div></div>
+      ${k.pr?`<div style="font-size:12.5px;color:var(--muted);margin-top:10px;line-height:1.5"><b style="color:var(--navy)">Cómo la quieres:</b> ${esc(k.pr)}</div>`:''}
+      <div style="margin-top:12px;display:flex;justify-content:space-between;gap:12px;align-items:baseline;border-top:1px solid var(--line);padding-top:10px;font-size:13.5px"><span style="color:var(--muted)">Total estimado con envío a ${k.dest}</span><b style="font-size:17px;color:var(--navy);white-space:nowrap">${k.total?usd(k.total):'Se cotiza'}</b></div>
+    </div>
+    <div class="box"><h3>¿Quieres agregarle algo?</h3>
+      <p style="font-size:12.5px;color:var(--muted);margin:-4px 0 12px;line-height:1.45">Toca los que quieras. Tu asesor te los cotiza junto con tu orden.</p>
+      <div class="svcs">${EXTRAS.map(e=>`<button type="button" class="svc ${k.ex.includes(e.id)?'on':''}" data-id="${e.id}" onclick="toggleSvc(this)"><div><b>${e.n}</b><small>${e.d}</small></div><span class="add">${k.ex.includes(e.id)?'✓ Agregado':'+ Agregar'}</span></button>`).join('')}</div>
+    </div>
+    <div class="box"><h3>¿Cómo te contactamos?</h3>
+      <p style="font-size:12.5px;color:var(--muted);margin:-4px 0 12px;line-height:1.45">Tu asesor te escribe a este número para seguir con tu orden.</p>
+      <div class="field"><label>Tu nombre</label><input id="oNom" value="${usuario?esc(usuario.nombre):''}" autocomplete="name"></div>
+      <div class="field"><label>WhatsApp</label><input id="oWa" type="tel" value="${usuario?esc(usuario.wa||''):''}" placeholder="+58 4xx xxx xxxx" autocomplete="tel"></div>
+      <div class="field" style="margin-bottom:0"><label>¿Dónde vives?</label><input id="oCiu" value="${usuario&&usuario.ciudad&&usuario.ciudad!=='—'?esc(usuario.ciudad):''}" placeholder="Ej. Caracas, Valencia, Porlamar"></div>
+    </div>
+    <div style="height:90px"></div>
+  </section>`;
+  document.querySelectorAll('.view').forEach(x=>x.classList.remove('on')); v.classList.add('on');
+  $('#nav').style.display='none'; clearInterval(timerInt);
+  const old=$('.sticky'); if(old) old.remove();
+  const st=document.createElement('div'); st.className='sticky';
+  st.innerHTML=`<div><small>Total estimado</small><b>${k.total?usd(k.total):'Se cotiza'}</b></div><button class="btn gold" onclick="comprar()">Confirmar orden</button>`;
+  document.body.appendChild(st);
+  window.scrollTo(0,0);
+}
+function toggleSvc(b){ b.classList.toggle('on'); const on=b.classList.contains('on'); b.querySelector('.add').textContent=on?'✓ Agregado':'+ Agregar'; const id=b.dataset.id; carrito.ex=carrito.ex.filter(x=>x!==id); if(on) carrito.ex.push(id); }
 function tick(){ const e=$('#count'); if(!e||!actual) return clearInterval(timerInt); const r=restante(actual.cierra); e.innerHTML=[[r.d,'DÍAS'],[r.h,'HORAS'],[r.m,'MIN'],[r.s,'SEG']].map(([n,l])=>`<div><b>${String(n).padStart(2,'0')}</b><small>${l}</small></div>`).join(''); }
 /* Comisión de Copart/IAA según su tabla pública (título no limpio, fondos seguros) + puja en línea + gate $95 + ambiental $15 */
 const TABLA_SUB=[[50,25],[100,45],[200,80],[300,130],[400,145],[500,185],[600,210],[700,240],[800,270],[900,295],[1000,320],[1500,430],[2000,510],[2500,570],[3000,610],[3500,655],[4000,705],[4500,725],[5000,750],[5500,775],[6000,800],[6500,825],[7000,845],[7500,880],[8000,900],[8500,925],[10000,945],[15000,1000]];
@@ -947,14 +1000,15 @@ function comprar(){
   if(cWa.replace(/\D/g,'').length<10){ toast('Escribe tu WhatsApp con el código del país'); const w=document.getElementById('oWa'); if(w){w.focus();w.scrollIntoView({block:'center'});} return; }
   if(!cCiu){ toast('Dinos en qué ciudad vives'); const w=document.getElementById('oCiu'); if(w){w.focus();w.scrollIntoView({block:'center'});} return; }
   if(!usuario.wa){ usuario.wa=cWa; guardar(); if(sb&&usuario.uid) sb.from('perfiles').update({whatsapp:cWa}).eq('id',usuario.uid).then(()=>{}); }
-  const c=actual, ex=[...document.querySelectorAll('.extra input:checked')].map(i=>EXTRAS.find(e=>e.id===i.value).n);
+  if(!carrito) return;
+  const c=actual, ex=carrito.ex.map(id=>EXTRAS.find(e=>e.id===id).n);
   const cod='I2-'+Math.random().toString(36).slice(2,7).toUpperCase();
-  const pr=prefs();
-  if(sb&&usuario.uid){ sb.from('ordenes').insert({codigo:cod,vehiculo:`${c.an} ${c.marca} ${c.mod}`,detalle:{rubro:c.cat,lote:c.lote||'',vin:c.vin||'',precio:c.puja||null,prefs:pr,extras:ex,cliente:cNom,whatsapp:cWa,ciudad:cCiu}}).then(({error})=>{ if(error) toast('No se pudo guardar en línea: envíanos la orden por WhatsApp.'); }); }
-  avisarAnyi('Nueva orden '+cod+' · '+`${c.an} ${c.marca} ${c.mod}`,{Orden:cod,'Vehículo':`${c.an} ${c.marca} ${c.mod}`,Rubro:c.cat==='publica'?'Subasta pública ('+c.sub+')':c.cat==='privada'?'Subasta privada (por encargo)':'Concesionario 0 km',Lote:c.lote||'',VIN:c.vin||'',Precio:c.puja?usd(c.puja):'Se cotiza','Cómo la quiere':pr||'—',Servicios:ex.join(', ')||'—',Cliente:cNom,WhatsApp:cWa,Correo:usuario.mail||'','Vive en':cCiu});
+  const pr=carrito.pr;
+  if(sb&&usuario.uid){ sb.from('ordenes').insert({codigo:cod,vehiculo:`${c.an} ${c.marca} ${c.mod}`,detalle:{rubro:c.cat,lote:c.lote||'',vin:c.vin||'',precio:carrito.puja||null,total:carrito.total||null,destino:carrito.dest,prefs:pr,extras:ex,cliente:cNom,whatsapp:cWa,ciudad:cCiu}}).then(({error})=>{ if(error) toast('No se pudo guardar en línea: envíanos la orden por WhatsApp.'); }); }
+  avisarAnyi('Nueva orden '+cod+' · '+`${c.an} ${c.marca} ${c.mod}`,{Orden:cod,'Vehículo':`${c.an} ${c.marca} ${c.mod}`,Rubro:c.cat==='publica'?'Subasta pública ('+c.sub+')':c.cat==='privada'?'Subasta privada (por encargo)':'Concesionario 0 km',Lote:c.lote||'',VIN:c.vin||'',Precio:carrito.puja?usd(carrito.puja):'Se cotiza','Total estimado':carrito.total?usd(carrito.total)+' (envío a '+carrito.dest+')':'Se cotiza','Cómo la quiere':pr||'—',Servicios:ex.join(', ')||'—',Cliente:cNom,WhatsApp:cWa,Correo:usuario.mail||'','Vive en':cCiu});
   ordenes.unshift({cod,id:c.id,nom:`${c.an} ${c.marca} ${c.mod}`,ex,pr,paso:1,fecha:new Date().toLocaleDateString('es-VE')}); guardar();
   toast('Orden '+cod+' creada. Tu asesor te escribe por WhatsApp.');
-  irA('ordenes');
+  carrito=null; irA('ordenes');
   const msg=`Hola, soy ${cNom}. Generé la orden ${cod} para la ${c.an} ${c.marca} ${c.mod} ${c.cat==='publica'?'(lote '+c.lote+', VIN '+c.vin+')':c.cat==='privada'?'(por encargo, subasta privada)':'(0 km de concesionario)'}.${pr?' Cómo la quiero: '+pr+'.':''}${ex.length?' Servicios: '+ex.join(', ')+'.':''}`;
   $('#ordenesBox').insertAdjacentHTML('afterbegin',`<a class="btn gold" style="text-decoration:none;margin-top:14px" href="https://wa.me/${WA}?text=${encodeURIComponent(msg)}" target="_blank" rel="noopener">Enviar mi orden por WhatsApp</a>`);
 }
@@ -964,9 +1018,18 @@ const PASOS=[['Orden generada','Recibimos tu orden con su código.'],['Confirmac
 function pintarOrdenes(){
   const b=$('#ordenesBox');
   if(!usuario){b.innerHTML='<div class="empty">Crea tu cuenta para rastrear tu camioneta.<br><br><button class="btn gold" onclick="abrir(\'registro\')">Crear mi cuenta</button></div>';return}
-  if(!ordenes.length){b.innerHTML='<div class="empty">Todavía no tienes órdenes. Escoge tu camioneta y la rastreas aquí hasta tu puerta.</div>';return}
-  b.innerHTML=ordenes.map(o=>`<div class="box"><h3>${o.nom}</h3><div class="sub" style="font-size:12px;color:var(--muted);margin:-6px 0 14px">Orden ${o.cod} · ${o.fecha}</div>
-    <div class="track">${PASOS.map((p,i)=>`<div class="tk ${i<o.paso?'done':i===o.paso?'now':''}"><b>${p[0]}</b><p>${p[1]}</p></div>`).join('')}</div></div>`).join('');
+  const vivas=ordenes.filter(o=>o.paso!==0);
+  if(!vivas.length){b.innerHTML='<div class="empty">Todavía no tienes órdenes. Escoge tu camioneta y la rastreas aquí hasta tu puerta.</div>';return}
+  b.innerHTML=vivas.map(o=>`<div class="box" ${o.paso===0?'style="opacity:.6"':''}><h3>${o.nom}</h3><div class="sub" style="font-size:12px;color:var(--muted);margin:-6px 0 14px">Orden ${o.cod} · ${o.fecha}</div>
+    ${o.paso===0?'<div style="font-size:14px;font-weight:700;color:#B3261E">Orden cancelada</div>':`<div class="track">${PASOS.map((p,i)=>`<div class="tk ${i<o.paso?'done':i===o.paso?'now':''}"><b>${p[0]}</b><p>${p[1]}</p></div>`).join('')}</div>
+    ${o.paso===1?`<button class="btn line" style="margin-top:4px;border-color:#B3261E;color:#B3261E;font-size:14px;padding:11px" onclick="cancelarOrden('${o.cod}')">Cancelar orden</button>`:`<p style="font-size:12px;color:var(--muted);margin-top:4px">Para cambios o cancelación, habla con tu asesor.</p>`}`}</div>`).join('');
+}
+async function cancelarOrden(cod){
+  const o=ordenes.find(x=>x.cod===cod); if(!o) return;
+  if(!confirm('¿Seguro que quieres cancelar la orden '+cod+'?')) return;
+  if(sb&&usuario&&usuario.uid){ const {data,error}=await sb.rpc('cancelar_orden',{cod}); if(error||data===false){ toast('No se pudo cancelar. Escríbele a tu asesor.'); return; } }
+  o.paso=0; guardar(); pintarOrdenes(); toast('Orden '+cod+' cancelada');
+  avisarAnyi('Orden cancelada '+cod+' · '+o.nom,{Orden:cod,'Vehículo':o.nom,Cliente:usuario?usuario.nombre:'',WhatsApp:usuario?usuario.wa:'',Correo:usuario?usuario.mail:''});
 }
 /* ===== PERFIL ===== */
 function pintarPerfil(){
@@ -1017,21 +1080,25 @@ async function pintarPanel(){
   if(!sb||!usuario||!usuario.admin){b.innerHTML='<div class="empty">Esta sección es solo para la administración de Importa2.</div>';return}
   b.innerHTML='<div class="empty">Cargando…</div>';
   const [o,f,p]=await Promise.all([sb.from('ordenes').select('*').order('creado',{ascending:false}),sb.from('flotillas').select('*').order('creado',{ascending:false}),sb.from('perfiles').select('*').order('creado',{ascending:false})]);
-  const O=o.data||[], F=f.data||[], P=p.data||[], per={}; P.forEach(x=>per[x.id]=x);
+  const O=(o.data||[]).sort((a,b)=>(a.paso===0)-(b.paso===0)), F=f.data||[], P=p.data||[], per={}; P.forEach(x=>per[x.id]=x);
   const wa=n=>n?`<a href="https://wa.me/${String(n).replace(/\D/g,'')}" target="_blank" rel="noopener" style="color:#1FA855;font-weight:700">WhatsApp ${esc(n)}</a>`:'';
   const tabs=`<div class="seg">${[['ordenes','Órdenes ('+O.length+')'],['flotillas','Flotillas ('+F.length+')'],['clientes','Clientes ('+P.length+')']].map(([k,n])=>`<button class="${panelTab===k?'on':''}" onclick="panelTab='${k}';pintarPanel()">${n}</button>`).join('')}</div>`;
   let h='';
-  if(panelTab==='ordenes') h=O.map(x=>{const c=per[x.user_id]||{}, d=x.detalle||{}; return `<div class="box"><h3>${esc(x.vehiculo)}</h3><div style="font-size:12px;color:var(--muted);margin:-6px 0 10px">Orden ${esc(x.codigo)} · ${new Date(x.creado).toLocaleDateString('es-VE')}</div>
+  if(panelTab==='ordenes') h=O.map(x=>{const c=per[x.user_id]||{}, d=x.detalle||{}; return `<div class="box" ${x.paso===0?'style="opacity:.55"':''}><h3>${esc(x.vehiculo)}</h3><div style="font-size:12px;color:var(--muted);margin:-6px 0 10px">Orden ${esc(x.codigo)} · ${new Date(x.creado).toLocaleDateString('es-VE')}</div>
     <div style="font-size:13px;line-height:1.6"><b>${esc(c.nombre||d.cliente)}</b> · ${esc(c.correo)}<br>${wa(d.whatsapp||c.whatsapp)} · Vive en ${esc(d.ciudad||c.ciudad||'—')}<br>${d.lote?'Lote '+esc(d.lote)+' · ':''}${d.vin?'VIN '+esc(d.vin)+' · ':''}${d.precio?usd(d.precio):''}${d.prefs?'<br>Cómo la quiere: '+esc(d.prefs):''}${d.extras&&d.extras.length?'<br>Servicios: '+esc(d.extras.join(', ')):''}</div>
-    <div class="field" style="margin:12px 0 0"><label>Etapa que ve el cliente</label><select onchange="cambiarPaso(${x.id},this.value)">${PASOS.map((s,i)=>`<option value="${i+1}" ${x.paso===i+1?'selected':''}>${etapa(i+1)}</option>`).join('')}</select></div></div>`}).join('')||'<div class="empty">Todavía no hay órdenes.</div>';
+    <div class="field" style="margin:12px 0 0"><label>Etapa que ve el cliente</label><select onchange="cambiarPaso(${x.id},this.value)"><option value="0" ${x.paso===0?'selected':''}>Cancelada</option>${PASOS.map((s,i)=>`<option value="${i+1}" ${x.paso===i+1?'selected':''}>${etapa(i+1)}</option>`).join('')}</select></div></div>`}).join('')||'<div class="empty">Todavía no hay órdenes.</div>';
   else if(panelTab==='flotillas') h=F.map(x=>`<div class="box"><h3>${esc(x.empresa)} · ${esc(x.cantidad)} unidades</h3><div style="font-size:12px;color:var(--muted);margin:-6px 0 10px">${esc(x.codigo)} · ${new Date(x.creado).toLocaleDateString('es-VE')}</div>
     <div style="font-size:13px;line-height:1.6">${esc(x.nombre)} · ${esc(x.tipo)}<br>${wa(x.whatsapp)}<br>Modelos: ${esc(x.modelos)}${x.presupuesto?'<br>Presupuesto: $'+esc(x.presupuesto)+' por unidad':''}<br>Recibe en ${esc(x.destino)} · ${esc(x.cuando)}</div>
     <div class="field" style="margin:12px 0 0"><label>Estado</label><select onchange="cambiarFlota(${x.id},this.value)">${['Nueva','Cotizada','Cerrada','Descartada'].map(s=>`<option ${x.estado===s?'selected':''}>${s}</option>`).join('')}</select></div></div>`).join('')||'<div class="empty">Todavía no hay solicitudes de flotillas.</div>';
   else h=P.map(x=>`<div class="box"><h3>${esc(x.nombre||x.correo)}</h3><div style="font-size:13px;line-height:1.6;color:var(--muted)">${esc(x.correo)}<br>${wa(x.whatsapp)}<br>${esc(x.ciudad)} · ${esc(x.tipo)}</div>
-    <div class="saldo" style="margin-top:10px"><div><small style="font-size:12px;color:var(--muted);display:block">Millas</small><b>${(x.millas||0).toLocaleString('es-VE')}</b></div><span style="display:flex;gap:6px"><button class="btn line" style="width:auto;padding:8px 10px;font-size:12px" onclick="millasCliente('${x.id}',1000)">+1,000</button><button class="btn line" style="width:auto;padding:8px 10px;font-size:12px" onclick="millasCliente('${x.id}')">Otro</button></span></div></div>`).join('')||'<div class="empty">Todavía no hay clientes.</div>';
+    <div class="saldo" style="margin-top:10px"><div><small style="font-size:12px;color:var(--muted);display:block">Millas</small><b>${(x.millas||0).toLocaleString('es-VE')}</b></div><span style="display:flex;gap:6px"><button class="btn line" style="width:auto;padding:8px 10px;font-size:12px" onclick="millasCliente('${x.id}',1000)">+1,000</button><button class="btn line" style="width:auto;padding:8px 10px;font-size:12px" onclick="millasCliente('${x.id}')">Otro</button></span></div>${x.id!==usuario.uid?`<button class="btn line" style="margin-top:10px;border-color:#B3261E;color:#B3261E;font-size:13px;padding:9px" onclick="borrarCliente('${x.id}','${esc(x.correo||'')}')">Borrar esta cuenta</button>`:''}</div>`).join('')||'<div class="empty">Todavía no hay clientes.</div>';
   b.innerHTML=tabs+h;
 }
 async function cambiarPaso(id,v){ const {error}=await sb.from('ordenes').update({paso:+v,actualizado:new Date().toISOString()}).eq('id',id); toast(error?'No se pudo guardar':'Etapa actualizada'); }
+async function borrarCliente(uid,correo){
+  if(!confirm('¿Borrar la cuenta '+correo+'? Se borran también sus órdenes. No se puede deshacer.')) return;
+  const {error}=await sb.rpc('borrar_cliente',{cliente:uid}); toast(error?'No se pudo borrar':'Cuenta borrada'); pintarPanel();
+}
 async function cambiarFlota(id,v){ const {error}=await sb.from('flotillas').update({estado:v}).eq('id',id); toast(error?'No se pudo guardar':'Estado actualizado'); }
 async function millasCliente(uid,n){
   if(n==null){ const r=prompt('Millas a sumar (pon un número negativo para canjear):'); if(r===null) return; n=parseInt(r,10); if(!n){toast('Escribe un número');return} }
@@ -1145,6 +1212,7 @@ window.addEventListener('appinstalled',()=>{ const p=$('#instPill'); if(p) p.sty
 if(esApp()){ const p=$('#instPill'); if(p) p.style.display='none'; }
 else setTimeout(()=>{ let t=0; try{t=+localStorage.getItem('i2inst')||0}catch(e){} if(Date.now()-t<3*D) return; if(!$('.modal.on')) abrirInstalar(); },5500);
 if('serviceWorker' in navigator && /github\.io$/.test(location.hostname)) navigator.serviceWorker.register('sw.js').catch(()=>{});
+try{ history.replaceState({v:'inicio'},''); }catch(e){}
 pintarCats(); pintarMarcas(); refrescar(); cargarCuenta();
 /* cintillo: imagen animada que se reproduce una vez al verse y queda fija */
 {
