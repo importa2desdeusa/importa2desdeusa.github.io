@@ -742,7 +742,8 @@ const COSTOS = {
   envioTierra: 2999,       // envío a tierra firme
   envioMargarita: 3399,    // envío a Margarita
   comisionSubasta: 0.075,  // arriba de $15,000 Copart e IAA cobran 7.5% (título no limpio, fondos seguros)
-  broker: 500              // broker de subasta, lo paga el cliente
+  broker: 500,             // broker de subasta, lo paga el cliente
+  seguroDev: 200           // seguro de devolución (subasta pública), opcional
 };
 const WA = '16893392098';
 
@@ -1033,21 +1034,23 @@ function resumen(){
     if(c.cat==='publica'&&!puja){ toast('Escribe hasta cuánto quieres pujar'); const e=$('#cPuja'); if(e){e.focus();e.scrollIntoView({block:'center'});} return; }
     const total=puja?puja+(sub?feeSubasta(puja)+COSTOS.broker:0)+(sub?COSTOS.servicioSubasta:COSTOS.servicioConces)+(f.cDest==='margarita'?COSTOS.envioMargarita:COSTOS.envioTierra):0;
     const envioK=f.cDest==='margarita'?COSTOS.envioMargarita:COSTOS.envioTierra;
-    carrito={c,f,pr:prefs(),puja,total,pago1:total?total-envioK:0,dest:f.cDest==='margarita'?'Margarita':f.cDest==='otra'?(f.cCiu||'otra ciudad'):'tierra firme',ex:(carrito&&carrito.c.id===c.id?carrito.ex:[]),modo:(carrito&&carrito.c.id===c.id?carrito.modo:{})};
+    carrito={c,f,pr:prefs(),puja,total,pago1:total?total-envioK:0,dest:f.cDest==='margarita'?'Margarita':f.cDest==='otra'?(f.cCiu||'otra ciudad'):'tierra firme',seg:(carrito&&carrito.c.id===c.id&&carrito.seg!=null?carrito.seg:c.cat==='publica'),ex:(carrito&&carrito.c.id===c.id?carrito.ex:[]),modo:(carrito&&carrito.c.id===c.id?carrito.modo:{})};
   }
   if(!carrito) return;
   marcar({r:1});
-  const k=carrito, v=$('#v-resumen');
+  const k=carrito, v=$('#v-resumen'), segM=(c.cat==='publica'&&k.seg)?COSTOS.seguroDev:0;
+  k.totalF=k.total?k.total+segM:0; k.pago1F=k.pago1?k.pago1+segM:0;
   v.innerHTML=`<div class="top"><div class="top-row"><button class="iconbtn" onclick="atras()" aria-label="Volver"><svg width="18" height="18" fill="none" stroke="#fff" stroke-width="2"><path d="M11 4L6 9l5 5"/></svg></button></div><div class="hello" style="margin-top:10px"><small>Revisa, agrega lo que quieras y confirma</small><span>Tu orden</span></div></div>
   <section>
     <div class="box"><div style="display:flex;gap:12px;align-items:center">
       <div style="width:84px;height:62px;border-radius:10px;flex:none;background:#E9EDF3 ${c.img?`url(${c.img}?v=2) center/cover`:''}"></div>
       <div><b style="font-size:15px;color:var(--navy)">${c.an} ${c.marca} ${c.mod}</b><div style="font-size:12px;color:var(--muted);margin-top:2px">${c.cat==='publica'?'Subasta pública · lote '+c.lote:c.cat==='privada'?'Subasta privada · por encargo':'Concesionario · 0 km'}</div></div></div>
       ${k.pr?`<div style="font-size:12.5px;color:var(--muted);margin-top:10px;line-height:1.5"><b style="color:var(--navy)">Cómo la quieres:</b> ${esc(k.pr)}</div>`:''}
-      <div style="margin-top:12px;display:flex;justify-content:space-between;gap:12px;align-items:baseline;border-top:1px solid var(--line);padding-top:10px;font-size:13.5px"><span style="color:var(--muted)">Total estimado con envío a ${k.dest}</span><b style="font-size:17px;color:var(--navy);white-space:nowrap">${k.total?usd(k.total):'Se cotiza'}</b></div>
+      <div style="margin-top:12px;display:flex;justify-content:space-between;gap:12px;align-items:baseline;border-top:1px solid var(--line);padding-top:10px;font-size:13.5px"><span style="color:var(--muted)">Total estimado con envío a ${k.dest}${segM?' y seguro':''}</span><b style="font-size:17px;color:var(--navy);white-space:nowrap">${k.total?usd(k.totalF):'Se cotiza'}</b></div>
     </div>
+    ${c.cat==='publica'?`<div class="box"><button type="button" class="svc ${k.seg?'on':''}" onclick="carrito.seg=!carrito.seg;resumen()"><div><b>Seguro de devolución · $${COSTOS.seguroDev}</b><small>Si el auto no está en las condiciones esperadas, se devuelve a la subasta y solo pierdes los $${COSTOS.seguroDev}. Opcional, te lo recomendamos.</small></div><span class="add">${k.seg?'✓ Incluido':'+ Agregar'}</span></button></div>`:''}
     ${k.pago1?`<div class="box"><h3>Cómo se paga</h3>
-      <div style="display:flex;justify-content:space-between;gap:12px;align-items:baseline;font-size:13.5px"><span><b style="color:var(--navy)">Pago 1 · tu camioneta</b><br><span style="color:var(--muted);font-size:12px">${c.cat==='conces'?'Precio de referencia: tu asesor te confirma el monto final':'Antes de pujar, por tu puja máxima'}</span></span><b style="font-size:17px;color:var(--navy);white-space:nowrap">${usd(k.pago1)}</b></div>
+      <div style="display:flex;justify-content:space-between;gap:12px;align-items:baseline;font-size:13.5px"><span><b style="color:var(--navy)">Pago 1 · tu auto</b><br><span style="color:var(--muted);font-size:12px">${c.cat==='conces'?'Precio de referencia: tu asesor te confirma el monto final':'Antes de pujar, por tu puja máxima'}</span></span><b style="font-size:17px;color:var(--navy);white-space:nowrap">${usd(k.pago1F)}</b></div>
       <div style="font-size:12.5px;color:var(--muted);margin-top:8px">Pago 2 · envío y Pago 3 · aduana, cuando llegue cada etapa.</div>
       ${comoFunciona(c.cat)}
     </div>`:''}
@@ -1067,7 +1070,7 @@ function resumen(){
   $('#nav').style.display='none'; clearInterval(timerInt);
   const old=$('.sticky'); if(old) old.remove();
   const st=document.createElement('div'); st.className='sticky';
-  st.innerHTML=`<div><small>Total estimado</small><b>${k.total?usd(k.total):'Se cotiza'}</b></div><button class="btn gold" onclick="comprar()">Confirmar orden</button>`;
+  st.innerHTML=`<div><small>Total estimado</small><b>${k.total?usd(k.totalF):'Se cotiza'}</b></div><button class="btn gold" onclick="comprar()">Confirmar orden</button>`;
   document.body.appendChild(st);
   window.scrollTo(0,0);
 }
@@ -1109,11 +1112,11 @@ function comprar(){
   const c=actual, ex=carrito.ex.map(id=>{const e=EXTRAS.find(x=>x.id===id); return e.n+' ('+((carrito.modo||{})[id]||MODOS[e.g][0])+')';});
   const cod='I2-'+Math.random().toString(36).slice(2,7).toUpperCase();
   const pr=carrito.pr;
-  if(sb&&usuario.uid){ sb.from('ordenes').insert({codigo:cod,vehiculo:`${c.an} ${c.marca} ${c.mod}`,detalle:{rubro:c.cat,lote:c.lote||'',vin:c.vin||'',precio:carrito.puja||null,total:carrito.total||null,pago1:carrito.pago1||null,destino:carrito.dest,prefs:pr,extras:ex,cliente:cNom,whatsapp:cWa,ciudad:cCiu}}).then(({error})=>{ if(error) toast('No se pudo guardar en línea: envíanos la orden por WhatsApp.'); }); }
-  avisarAnyi('Nueva orden '+cod+' · '+`${c.an} ${c.marca} ${c.mod}`,{Orden:cod,'Vehículo':`${c.an} ${c.marca} ${c.mod}`,Rubro:c.cat==='publica'?'Subasta pública ('+c.sub+')':c.cat==='privada'?'Subasta privada (por encargo)':'Concesionario 0 km',Lote:c.lote||'',VIN:c.vin||'',Precio:carrito.puja?usd(carrito.puja):'Se cotiza','Total estimado':carrito.total?usd(carrito.total)+' (envío a '+carrito.dest+')':'Se cotiza','Cómo la quiere':pr||'—',Servicios:ex.join(', ')||'—',Cliente:cNom,WhatsApp:cWa,Correo:usuario.mail||'','Vive en':cCiu});
-  ordenes.unshift({cod,id:c.id,nom:`${c.an} ${c.marca} ${c.mod}`,ex,pr,paso:1,rubro:c.cat,pago1:carrito.pago1||0,montoOk:false,pago:null,fecha:new Date().toLocaleDateString('es-VE')}); guardar();
+  if(sb&&usuario.uid){ sb.from('ordenes').insert({codigo:cod,vehiculo:`${c.an} ${c.marca} ${c.mod}`,detalle:{rubro:c.cat,lote:c.lote||'',vin:c.vin||'',precio:carrito.puja||null,total:carrito.totalF||carrito.total||null,pago1:carrito.pago1F||carrito.pago1||null,seguro:!!(carrito.c.cat==='publica'&&carrito.seg),destino:carrito.dest,prefs:pr,extras:ex,cliente:cNom,whatsapp:cWa,ciudad:cCiu}}).then(({error})=>{ if(error) toast('No se pudo guardar en línea: envíanos la orden por WhatsApp.'); }); }
+  avisarAnyi('Nueva orden '+cod+' · '+`${c.an} ${c.marca} ${c.mod}`,{Orden:cod,'Vehículo':`${c.an} ${c.marca} ${c.mod}`,Rubro:c.cat==='publica'?'Subasta pública ('+c.sub+')':c.cat==='privada'?'Subasta privada (por encargo)':'Concesionario 0 km',Lote:c.lote||'',VIN:c.vin||'',Precio:carrito.puja?usd(carrito.puja):'Se cotiza','Seguro de devolución':carrito.c.cat==='publica'?(carrito.seg?'Sí ($200)':'No'):'—','Total estimado':carrito.total?usd(carrito.totalF||carrito.total)+' (envío a '+carrito.dest+')':'Se cotiza','Cómo la quiere':pr||'—',Servicios:ex.join(', ')||'—',Cliente:cNom,WhatsApp:cWa,Correo:usuario.mail||'','Vive en':cCiu});
+  ordenes.unshift({cod,id:c.id,nom:`${c.an} ${c.marca} ${c.mod}`,ex,pr,paso:1,rubro:c.cat,pago1:carrito.pago1F||carrito.pago1||0,montoOk:false,pago:null,fecha:new Date().toLocaleDateString('es-VE')}); guardar();
   toast('Orden '+cod+' creada. Tu asesor te escribe por WhatsApp.');
-  const p1=carrito.pago1; carrito=null;
+  const p1=carrito.pago1F||carrito.pago1; carrito=null;
   if(p1&&c.cat!=='conces'){ setTimeout(()=>pagar(cod),400); return; }
   irA('ordenes');
   const msg=`Hola, soy ${cNom}. Generé la orden ${cod} para la ${c.an} ${c.marca} ${c.mod} ${c.cat==='publica'?'(lote '+c.lote+', VIN '+c.vin+')':c.cat==='privada'?'(por encargo, subasta privada)':'(0 km de concesionario)'}.${pr?' Cómo la quiero: '+pr+'.':''}${ex.length?' Servicios: '+ex.join(', ')+'.':''}`;
@@ -1360,7 +1363,7 @@ async function abrirInstalar(espera){
   else if(esIOS){ pasos=['Toca el ícono '+ICO_SHARE+' que está abajo en tu pantalla','Toca <b>"Agregar a inicio"</b>']; pos='abajo'; }
   else if(esSamsung){ pasos=['Toca el ícono <b>≡</b> que está abajo en tu pantalla','Toca <b>"Agregar página a"</b> › <b>"Pantalla de inicio"</b>']; pos='abajo'; }
   else { pasos=['Toca el ícono <b>⋮</b> que está arriba en tu pantalla','Toca <b>"Instalar app"</b>']; pos='arriba'; }
-  $('#instCard').innerHTML=`<div class="ib"><img src="img/icon-192.png?v=3" alt=""><div><b class="tt">Importa2 App, muy pronto en Google Play y App Store</b><span class="st">Mientras tanto, tenla en tu pantalla en 2 toques:</span><ol>${pasos.map(x=>`<li>${x}</li>`).join('')}</ol></div><button onclick="cerrarInstalar()" aria-label="Cerrar">✕</button></div>${enAppAjena?'<button class="btn gold" style="margin-top:10px" onclick="copiarLink()">Copiar el link</button>':''}<div class="flecha2 ${pos}">${pos==='abajo'?'↓':'↑'}</div>`;
+  $('#instCard').innerHTML=`<div class="ib"><img src="img/icon-192.png?v=3" alt=""><div><b class="tt">Importa2 App, muy pronto en Google Play y App Store</b><span class="st">Mientras tanto, bájala directamente a tu pantalla en 2 toques:</span><ol>${pasos.map(x=>`<li>${x}</li>`).join('')}</ol></div><button onclick="cerrarInstalar()" aria-label="Cerrar">✕</button></div>${enAppAjena?'<button class="btn gold" style="margin-top:10px" onclick="copiarLink()">Copiar el link</button>':''}<div class="flecha2 ${pos}">${pos==='abajo'?'↓':'↑'}</div>`;
   $('#inst').className='inst on '+pos;
 }
 async function instalarYa(){ if(!deferredInstall) return; deferredInstall.prompt(); let r={}; try{ r=await deferredInstall.userChoice; }catch(e){} deferredInstall=null; cerrarInstalar(); if(r.outcome==='accepted'){ toast('¡Listo! Importa2 quedó en tu pantalla'); const p=$('#instPill'); if(p) p.style.display='none'; } }
@@ -1368,7 +1371,7 @@ function cerrarInstalar(){ $('#inst').classList.remove('on'); try{localStorage.s
 function copiarLink(){ const u='https://importa2desdeusa.github.io/'; try{navigator.clipboard.writeText(u);toast('Link copiado. Pégalo en tu navegador.')}catch(e){toast(u)} }
 window.addEventListener('appinstalled',()=>{ const p=$('#instPill'); if(p) p.style.display='none'; });
 if(esApp()){ const p=$('#instPill'); if(p) p.style.display='none'; }
-else setTimeout(()=>{ let t=0; try{t=+localStorage.getItem('i2inst')||0}catch(e){} if(Date.now()-t<3*D) return; if(!$('.modal.on')) abrirInstalar(); },5500);
+/* la guía de instalar solo se abre cuando el cliente toca "Instalar app" */
 if('serviceWorker' in navigator && /github\.io$/.test(location.hostname)) navigator.serviceWorker.register('sw.js',{updateViaCache:'none'}).then(r=>r.update()).catch(()=>{});
 try{ history.replaceState({v:'inicio'},''); }catch(e){}
 pintarCats(); pintarMarcas(); refrescar(); cargarCuenta();
