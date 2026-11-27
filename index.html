@@ -354,6 +354,36 @@ nav .wa svg{stroke:#1FA855}
 .sp-route{stroke-dasharray:4 6;stroke-dashoffset:200;animation:route 1.9s linear .8s forwards}
 @keyframes route{to{stroke-dashoffset:0}}
 @media (prefers-reduced-motion:reduce){#splash{animation-duration:.2s;animation-delay:1.2s}}
+
+/* ===== VERSIÓN WEB (pantallas grandes): mismo contenido, formato de página ===== */
+@media (min-width:960px){
+  body{background:var(--bg)}
+  .phone{max-width:1180px;padding:76px 0 40px}
+  nav{top:0;bottom:auto;left:0;transform:none;max-width:none;width:100%;height:64px;padding:0 max(24px,calc((100vw - 1180px)/2 + 24px));justify-content:flex-end;gap:6px;border-top:0;border-bottom:1px solid var(--line);box-shadow:0 2px 12px rgba(11,31,63,.06)}
+  nav:before{content:"";position:absolute;left:max(24px,calc((100vw - 1180px)/2 + 24px));top:12px;width:40px;height:40px;border-radius:11px;background:url(img/icon-192.png?v=3) center/cover}
+  nav:after{content:"Importa2";position:absolute;left:calc(max(24px,calc((100vw - 1180px)/2 + 24px)) + 52px);top:19px;font-family:var(--serif);font-size:22px;color:var(--navy);font-weight:700}
+  nav button,nav a.navlink{flex-direction:row;gap:8px;font-size:14px;padding:10px 14px;border-radius:12px}
+  nav button.on{background:#EEF2FA}
+  .top{border-radius:0 0 30px 30px;padding:28px 40px 30px}
+  section{padding:28px 40px 0}
+  .cint{margin:20px 40px 0;aspect-ratio:auto;height:380px}
+  .cats{grid-template-columns:repeat(3,1fr)}
+  .brands{overflow:visible;flex-wrap:wrap}
+  .brandchip{width:150px!important;height:220px!important}
+  .miniw:after,.mflecha,.desl{display:none!important}
+  .mini{display:grid!important;grid-template-columns:repeat(6,1fr);overflow:visible}
+  .mc{min-width:0!important}
+  .mc .mp{height:110px}
+  .grid{grid-template-columns:repeat(3,1fr)}
+  #v-ficha>*,#v-resumen>*,#v-pagar>*,#v-ordenes>*,#v-perfil>*,#v-legal>*,#v-millas>*,#v-contacto>*,#v-panel>*,#v-favs>*,#v-flotas>*{max-width:860px;margin-left:auto;margin-right:auto}
+  #v-ficha .top,#v-resumen .top,#v-pagar .top,#v-ordenes .top,#v-perfil .top,#v-legal .top,#v-millas .top,#v-contacto .top,#v-panel .top,#v-favs .top,#v-flotas .top{max-width:none}
+  .sticky{max-width:860px;border-radius:18px 18px 0 0;box-shadow:0 -6px 20px rgba(11,31,63,.1)}
+  .modal{align-items:center}
+  .sheet,.inst .card{max-width:480px;border-radius:24px!important}
+  .toast{bottom:40px}
+  .mil{max-width:none}
+  .ficha .gal{aspect-ratio:16/9;border-radius:0 0 24px 24px;margin-top:-56px}
+}
 </style>
 </head>
 <body>
@@ -1350,6 +1380,8 @@ const esApp=()=>{try{return window.matchMedia('(display-mode: standalone)').matc
 const UA=navigator.userAgent||'';
 const esIOS=/iphone|ipad|ipod/i.test(UA)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
 const enAppAjena=/FBAN|FBAV|FB_IAB|Instagram|Line\/|TikTok|musical_ly|BytedanceWebview|WhatsApp|GSA\//i.test(UA);
+const esCompu=!esIOS&&!/Android/i.test(UA);
+const esSafariMac=/Macintosh/i.test(UA)&&/Safari/i.test(UA)&&!/Chrome|Chromium|Edg\//i.test(UA);
 const esSafariIOS=esIOS&&/Safari/i.test(UA)&&!/CriOS|FxiOS|EdgiOS|OPiOS/i.test(UA)&&!enAppAjena;
 const ICO_SHARE='<span class="sym"><svg width="16" height="18" fill="none" stroke="#1F4FA3" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 11V1.5M4.5 5L8 1.5 11.5 5"/><path d="M5 8H2.5v8.5h11V8H11"/></svg></span>';
 const ICO_PLUS='<span class="sym"><svg width="16" height="16" fill="none" stroke="#1F4FA3" stroke-width="2" stroke-linecap="round"><rect x="1.5" y="1.5" width="13" height="13" rx="3"/><path d="M8 5v6M5 8h6"/></svg></span>';
@@ -1360,7 +1392,10 @@ async function abrirInstalar(espera){
   if(!esIOS&&!enAppAjena&&!espera){ for(let i=0;i<8&&!deferredInstall;i++) await new Promise(r=>setTimeout(r,250)); if(deferredInstall) return instalarYa(); }
   let pasos, pos;
   if(enAppAjena){ pasos=['Abre este link en <b>'+(esIOS?'Safari':'Chrome')+'</b>','Ahí te sale cómo agregarla a tu pantalla']; pos='arriba'; }
+  else if(esIOS&&/CriOS/i.test(UA)){ pasos=['Toca el ícono '+ICO_SHARE+' que está arriba, al lado de la dirección','Toca <b>"Agregar a pantalla de inicio"</b>']; pos='arriba'; }
   else if(esIOS){ pasos=['Toca el ícono '+ICO_SHARE+' que está abajo en tu pantalla','Toca <b>"Agregar a inicio"</b>']; pos='abajo'; }
+  else if(esCompu&&esSafariMac){ pasos=['Toca el ícono '+ICO_SHARE+' que está arriba a la derecha de Safari','Toca <b>"Agregar al Dock"</b>']; pos='arriba'; }
+  else if(esCompu){ pasos=['Toca el ícono de instalar que aparece a la derecha de la barra de dirección','Toca <b>"Instalar"</b>']; pos='arriba'; }
   else if(esSamsung){ pasos=['Toca el ícono <b>≡</b> que está abajo en tu pantalla','Toca <b>"Agregar página a"</b> › <b>"Pantalla de inicio"</b>']; pos='abajo'; }
   else { pasos=['Toca el ícono <b>⋮</b> que está arriba en tu pantalla','Toca <b>"Instalar app"</b>']; pos='arriba'; }
   $('#instCard').innerHTML=`<div class="ib"><img src="img/icon-192.png?v=3" alt=""><div><b class="tt">Importa2 App, muy pronto en Google Play y App Store</b><span class="st">Mientras tanto, bájala directamente a tu pantalla en 2 toques:</span><ol>${pasos.map(x=>`<li>${x}</li>`).join('')}</ol></div><button onclick="cerrarInstalar()" aria-label="Cerrar">✕</button></div>${enAppAjena?'<button class="btn gold" style="margin-top:10px" onclick="copiarLink()">Copiar el link</button>':''}<div class="flecha2 ${pos}">${pos==='abajo'?'↓':'↑'}</div>`;
