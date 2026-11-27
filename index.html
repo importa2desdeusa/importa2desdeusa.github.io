@@ -752,6 +752,10 @@ function guardar(){ try{localStorage.setItem('i2u',JSON.stringify(usuario));loca
 /* ===== BASE DE DATOS (Supabase) ===== */
 const SB_URL='https://qgwvrtcoyjwjshgzhrau.supabase.co', SB_KEY='sb_publishable_PM6WQeZvIvzA9tRkbmZrWw_UQo-natU';
 let sb=null; try{ if(window.supabase) sb=window.supabase.createClient(SB_URL,SB_KEY); }catch(e){ sb=null; }
+/* Aviso automático al correo de Anyi (FormSubmit) */
+function avisarAnyi(asunto,datos){
+  try{ fetch('https://formsubmit.co/ajax/importa2desdeusa@gmail.com',{method:'POST',headers:{'Content-Type':'application/json','Accept':'application/json'},body:JSON.stringify(Object.assign({_subject:asunto,_template:'table',_captcha:'false'},datos))}).catch(()=>{}); }catch(e){}
+}
 function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 async function cargarCuenta(){
   if(!sb) return;
@@ -935,6 +939,7 @@ function comprar(){
   const cod='I2-'+Math.random().toString(36).slice(2,7).toUpperCase();
   const pr=prefs();
   if(sb&&usuario.uid){ sb.from('ordenes').insert({codigo:cod,vehiculo:`${c.an} ${c.marca} ${c.mod}`,detalle:{rubro:c.cat,lote:c.lote||'',vin:c.vin||'',precio:c.puja||null,prefs:pr,extras:ex,cliente:usuario.nombre,whatsapp:usuario.wa}}).then(({error})=>{ if(error) toast('No se pudo guardar en línea: envíanos la orden por WhatsApp.'); }); }
+  avisarAnyi('Nueva orden '+cod+' · '+`${c.an} ${c.marca} ${c.mod}`,{Orden:cod,'Vehículo':`${c.an} ${c.marca} ${c.mod}`,Rubro:c.cat==='publica'?'Subasta pública ('+c.sub+')':c.cat==='privada'?'Subasta privada (por encargo)':'Concesionario 0 km',Lote:c.lote||'',VIN:c.vin||'',Precio:c.puja?usd(c.puja):'Se cotiza','Cómo la quiere':pr||'—',Servicios:ex.join(', ')||'—',Cliente:usuario.nombre,WhatsApp:usuario.wa||'',Correo:usuario.mail||'','Recibe en':usuario.ciudad||''});
   ordenes.unshift({cod,id:c.id,nom:`${c.an} ${c.marca} ${c.mod}`,ex,pr,paso:1,fecha:new Date().toLocaleDateString('es-VE')}); guardar();
   toast('Orden '+cod+' creada. Tu asesor te escribe por WhatsApp.');
   irA('ordenes');
@@ -976,6 +981,7 @@ async function registrar(e){
     if(sb){
       btn.disabled=true; const {data,error}=await sb.auth.signUp({email:mail,password:pass,options:{data:meta}}); btn.disabled=false;
       if(error){toast(msgError(error));return}
+      avisarAnyi('Nuevo cliente registrado · '+meta.nombre,{Nombre:meta.nombre,WhatsApp:meta.whatsapp,Correo:mail,'Recibe en':meta.ciudad,Perfil:meta.tipo});
       if(!data.session){ cerrar('registro'); toast('Te enviamos un correo para confirmar tu cuenta.'); return }
       await cargarCuenta();
     } else { usuario={nombre:n,wa:meta.whatsapp,mail,ciudad:meta.ciudad,tipo:meta.tipo,millas:100}; guardar(); }
@@ -1039,6 +1045,7 @@ function pedirFlota(e){
   const v=id=>$('#'+id).value.trim();
   const msg=`Hola, soy ${v('fNom')} de ${v('fEmp')} (${v('fTipo')}). Solicitud de flotilla ${cod}: busco ${v('fCant')} unidades de ${v('fMod')}${v('fPres')?', presupuesto aproximado de $'+v('fPres')+' por unidad':''}. Las recibo en ${v('fDest')}. Plazo: ${v('fCuando')}. Mi WhatsApp: ${v('fWa')}.`;
   $('#fOk').innerHTML=`<p style="font-size:13px;color:var(--muted);margin:14px 0 8px;line-height:1.45">Tu solicitud <b style="color:var(--navy)">${cod}</b> está lista. Envíanosla por WhatsApp y un asesor te arma tu cotización.</p><a class="btn" style="text-decoration:none" href="https://wa.me/16893392098?text=${encodeURIComponent(msg)}" target="_blank" rel="noopener">Enviar por WhatsApp</a>`;
+  avisarAnyi('Nueva solicitud de flotilla '+cod+' · '+v('fEmp'),{Solicitud:cod,Empresa:v('fEmp'),Nombre:v('fNom'),WhatsApp:v('fWa'),Negocio:v('fTipo'),Modelos:v('fMod'),Unidades:v('fCant'),'Presupuesto por unidad':v('fPres')||'—','Recibe en':v('fDest'),Plazo:v('fCuando')});
   if(sb) sb.from('flotillas').insert({codigo:cod,empresa:v('fEmp'),nombre:v('fNom'),whatsapp:v('fWa'),tipo:v('fTipo'),modelos:v('fMod'),cantidad:v('fCant'),presupuesto:v('fPres'),destino:v('fDest'),cuando:v('fCuando')}).then(()=>{});
   toast('Solicitud '+cod+' lista');
 }
