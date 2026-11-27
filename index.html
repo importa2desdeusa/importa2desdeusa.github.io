@@ -909,7 +909,6 @@ function pintarPerfil(){
   b.innerHTML=`<div class="box"><div class="specs"><div><small>WhatsApp</small><b>${usuario.wa||'—'}</b></div><div><small>Correo</small><b style="font-size:13px">${usuario.mail}</b></div><div><small>Recibe en</small><b>${usuario.ciudad}</b></div><div><small>Perfil</small><b>${usuario.tipo}</b></div></div></div>
   <div class="box"><div class="saldo"><div><small style="font-size:12px;color:var(--muted);display:block">Tus Millas Importa2</small><b>${(usuario.millas??100).toLocaleString('es-VE')}</b></div><span style="font-size:12px;color:var(--gold);font-weight:700;text-align:right">Canjéalas con<br>tu asesor</span></div></div>
   <div class="box"><button class="btn line" onclick="pedirAvisos()">Activar avisos de camionetas nuevas</button></div>
-  <div class="box"><button class="btn line" onclick="abrir('requisitos')">Requisitos para nacionalizar</button></div>
   <div class="box"><button class="btn line" onclick="irA('legal')">Términos y privacidad</button></div>
   <section style="padding:14px 0"><button class="btn" style="background:#fff;color:var(--muted);border:1px solid var(--line)" onclick="usuario=null;guardar();refrescar();irA('inicio')">Cerrar sesión</button></section>`;
 }
