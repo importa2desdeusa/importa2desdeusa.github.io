@@ -140,6 +140,12 @@ section{padding:20px 20px 0}
 .inst .ib{display:flex;align-items:center;gap:12px;background:linear-gradient(135deg,#0B1F3F,#163a78);color:#fff;border-radius:18px;padding:14px 14px;font-size:14.5px;line-height:1.4;text-align:left;box-shadow:0 12px 30px rgba(0,0,0,.35);border:1.5px solid var(--gold)}
 .inst .ib img{width:44px;height:44px;border-radius:11px;flex:none}
 .inst .ib div{flex:1}.inst .ib b{color:#F2C94C}
+.inst .ib{align-items:flex-start!important}
+.inst .ib .tt{display:block;color:#fff!important;font-size:15px;line-height:1.3;margin-bottom:4px}
+.inst .ib .st{display:block;font-size:13px;color:#C9D3E6;margin-bottom:6px}
+.inst .ib ol{list-style:decimal!important;margin:0!important;padding-left:18px!important;text-align:left;font-size:13.5px;line-height:1.45}
+.inst .ib li::marker{color:#F2C94C;font-weight:800}
+.inst .ib li{display:list-item!important;padding:0!important;border:0!important;color:#fff!important;font-size:13.5px!important;margin-bottom:3px}
 .inst .ib .sym{background:rgba(255,255,255,.15)!important}
 .inst .ib .sym svg{stroke:#fff!important}
 .inst .ib button{flex:none;color:#A9B6CF;font-size:16px;padding:4px 6px}
@@ -1349,12 +1355,12 @@ const esSamsung=/SamsungBrowser/i.test(UA);
 async function abrirInstalar(espera){
   if(deferredInstall){ return instalarYa(); }
   if(!esIOS&&!enAppAjena&&!espera){ for(let i=0;i<8&&!deferredInstall;i++) await new Promise(r=>setTimeout(r,250)); if(deferredInstall) return instalarYa(); }
-  let txt, pos;
-  if(enAppAjena){ txt='Abre este link en '+(esIOS?'Safari':'Chrome')+' para instalar el app'; pos='arriba'; }
-  else if(esIOS){ txt='Toca el ícono '+ICO_SHARE+' que está abajo en tu pantalla y luego toca <b>"Agregar a inicio"</b>'; pos='abajo'; }
-  else if(esSamsung){ txt='Toca el ícono <b>≡</b> que está abajo en tu pantalla y luego toca <b>"Agregar página a"</b> › <b>"Pantalla de inicio"</b>'; pos='abajo'; }
-  else { txt='Toca el ícono <b>⋮</b> que está arriba en tu pantalla y luego toca <b>"Instalar app"</b>'; pos='arriba'; }
-  $('#instCard').innerHTML=`<div class="ib"><img src="img/icon-192.png?v=3" alt=""><div>${txt}</div><button onclick="cerrarInstalar()" aria-label="Cerrar">✕</button></div>${enAppAjena?'<button class="btn gold" style="margin-top:10px" onclick="copiarLink()">Copiar el link</button>':''}<div class="flecha2 ${pos}">${pos==='abajo'?'↓':'↑'}</div>`;
+  let pasos, pos;
+  if(enAppAjena){ pasos=['Abre este link en <b>'+(esIOS?'Safari':'Chrome')+'</b>','Ahí te sale cómo agregarla a tu pantalla']; pos='arriba'; }
+  else if(esIOS){ pasos=['Toca el ícono '+ICO_SHARE+' que está abajo en tu pantalla','Toca <b>"Agregar a inicio"</b>']; pos='abajo'; }
+  else if(esSamsung){ pasos=['Toca el ícono <b>≡</b> que está abajo en tu pantalla','Toca <b>"Agregar página a"</b> › <b>"Pantalla de inicio"</b>']; pos='abajo'; }
+  else { pasos=['Toca el ícono <b>⋮</b> que está arriba en tu pantalla','Toca <b>"Instalar app"</b>']; pos='arriba'; }
+  $('#instCard').innerHTML=`<div class="ib"><img src="img/icon-192.png?v=3" alt=""><div><b class="tt">Importa2 App, muy pronto en Google Play y App Store</b><span class="st">Mientras tanto, tenla en tu pantalla en 2 toques:</span><ol>${pasos.map(x=>`<li>${x}</li>`).join('')}</ol></div><button onclick="cerrarInstalar()" aria-label="Cerrar">✕</button></div>${enAppAjena?'<button class="btn gold" style="margin-top:10px" onclick="copiarLink()">Copiar el link</button>':''}<div class="flecha2 ${pos}">${pos==='abajo'?'↓':'↑'}</div>`;
   $('#inst').className='inst on '+pos;
 }
 async function instalarYa(){ if(!deferredInstall) return; deferredInstall.prompt(); let r={}; try{ r=await deferredInstall.userChoice; }catch(e){} deferredInstall=null; cerrarInstalar(); if(r.outcome==='accepted'){ toast('¡Listo! Importa2 quedó en tu pantalla'); const p=$('#instPill'); if(p) p.style.display='none'; } }
