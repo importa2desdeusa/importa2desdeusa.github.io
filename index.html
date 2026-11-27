@@ -132,6 +132,10 @@ section{padding:20px 20px 0}
 .step{display:flex;gap:12px;background:#fff;border-radius:16px;padding:14px;border:1px solid var(--line)}
 .step .n{flex:0 0 30px;height:30px;border-radius:50%;border:1.5px solid var(--gold);color:var(--gold);font-weight:700;display:grid;place-items:center;font-size:13px}
 .step b{font-size:14px;color:var(--navy)} .step p{font-size:12.5px;color:var(--muted);margin-top:2px;line-height:1.4}
+/* legal */
+.legal h2{font-family:var(--serif);font-size:22px;color:var(--navy);font-weight:600;margin-bottom:10px}
+.legal h3{font-size:14.5px;color:var(--navy);margin:16px 0 4px}
+.legal p{font-size:13.5px;color:var(--ink);line-height:1.55}
 /* 3 pagos */
 .pagos3{border-radius:22px;background:linear-gradient(135deg,#0B1F3F,#163A70);padding:22px 18px 24px;text-align:center;color:#fff;border:1.5px solid var(--gold)}
 .pagos3 em{font-family:var(--serif);font-style:italic;color:var(--gold2);font-size:15px}
@@ -471,6 +475,10 @@ nav .wa svg{stroke:#1FA855}
     <div id="contactoHome"></div>
   </section>
 
+  <div style="text-align:center;font-size:12px;color:var(--muted);padding:26px 20px 6px;line-height:1.8">
+    <a onclick="irA('legal');setTimeout(()=>document.getElementById('terminos').scrollIntoView(),50)" style="color:var(--muted);text-decoration:underline;cursor:pointer">Términos y condiciones</a> · <a onclick="irA('legal');setTimeout(()=>document.getElementById('privacidad').scrollIntoView(),50)" style="color:var(--muted);text-decoration:underline;cursor:pointer">Política de privacidad</a><br>© Importa2 · Importadora VIMO LLC · St. Cloud, Florida
+  </div>
+
 </div>
 
 <!-- BUSCAR -->
@@ -535,6 +543,59 @@ nav .wa svg{stroke:#1FA855}
   <div style="height:20px"></div>
 </div>
 
+<!-- LEGAL -->
+<div class="view" id="v-legal">
+  <div class="top">
+    <div class="top-row"><button class="iconbtn" onclick="irA('inicio')" aria-label="Volver"><svg width="18" height="18" fill="none" stroke="#fff" stroke-width="2"><path d="M11 4L6 9l5 5"/></svg></button></div>
+    <div class="hello" style="margin-top:10px"><small>Última actualización: 26 de noviembre de 2026</small><span>Términos y privacidad</span></div>
+  </div>
+  <section class="legal">
+    <h2 id="terminos">Términos y condiciones</h2>
+    <p>Importa2 es una marca de Importadora VIMO LLC, empresa registrada en Florida, Estados Unidos. Al usar el app de Importa2 y generar una orden aceptas estos términos. Si tienes dudas, escríbenos antes de comprar.</p>
+    <h3>1. Qué hacemos</h3>
+    <p>Importa2 gestiona la compra de carros y camionetas en Estados Unidos, en subastas y en concesionarios, y su envío a Venezuela. No somos los vendedores del vehículo: lo compramos contigo, al precio que fija la subasta o el concesionario, y cobramos por nuestra gestión.</p>
+    <h3>2. Catálogo, fotos y precios</h3>
+    <p>El catálogo es informativo y se actualiza a diario. Las fotos son referenciales del modelo y no son del vehículo exacto; las fotos reales del lote se ven en la página de la subasta y te las enviamos al generar tu orden. Precios, pujas, disponibilidad y fechas de cierre pueden cambiar en cualquier momento. Una puja no garantiza que el vehículo sea adjudicado.</p>
+    <h3>3. Totales estimados</h3>
+    <p>Los totales que muestra el app son estimados e incluyen la compra, nuestra gestión y el envío hasta Venezuela. No incluyen la nacionalización ni los impuestos del gobierno venezolano, que paga el cliente y que se cotizan caso por caso. El precio final se confirma por escrito con tu asesor.</p>
+    <h3>4. La orden de compra</h3>
+    <p>Generar una orden no es una compra ni un contrato. Es una solicitud: tu asesor te contacta, revisa contigo el vehículo, los servicios y los montos, y la compra solo avanza cuando los dos la confirman por escrito.</p>
+    <h3>5. Pagos en 3 etapas</h3>
+    <p>Pagas en tres momentos: compra, embarque y aduana. Cada etapa se paga cuando la anterior está cumplida. Los montos y las formas de pago se indican por escrito en cada orden.</p>
+    <h3>6. Estado de los vehículos de subasta</h3>
+    <p>Las subastas venden los vehículos en el estado en que se encuentran. Te ayudamos a revisar la información del lote, pero Importa2 no garantiza su condición mecánica ni estética. Las reparaciones son servicios opcionales que se cotizan aparte.</p>
+    <h3>7. Requisitos en Venezuela</h3>
+    <p>Los requisitos para nacionalizar, como el año mínimo del vehículo, los aranceles y los documentos, los fija el gobierno de Venezuela y pueden cambiar. La nacionalización la puedes hacer con tu propio agente aduanal o con el nuestro.</p>
+    <h3>8. Tiempos de entrega</h3>
+    <p>El tiempo de navegación es de unos 10 a 15 días. Es un estimado: la naviera, el puerto, la aduana o el clima pueden causar demoras que no dependen de nosotros.</p>
+    <h3>9. Cancelaciones y reembolsos</h3>
+    <p>Las condiciones de cancelación se acuerdan por escrito en cada orden. Los montos ya pagados a terceros, como la subasta, el concesionario o la naviera, no se pueden reembolsar una vez hechos.</p>
+    <h3>10. Millas Importa2</h3>
+    <p>Las Millas son un programa de beneficios. No tienen valor en efectivo ni se pueden transferir. Se suman cuando la compra se completa, duran 12 meses y se canjean con tu asesor por los servicios indicados en el app. Importa2 puede cambiar o terminar el programa avisándolo en el app.</p>
+    <h3>11. Ley aplicable</h3>
+    <p>Estos términos se rigen por las leyes del estado de Florida, Estados Unidos.</p>
+
+    <h2 id="privacidad" style="margin-top:30px">Política de privacidad</h2>
+    <h3>Qué datos pedimos</h3>
+    <p>Tu nombre, WhatsApp, correo, la ciudad donde recibes el vehículo y el tipo de cliente. También las órdenes que generas, tus preferencias de vehículo y los servicios que escoges. Si nos escribes como empresa, también el nombre de tu empresa.</p>
+    <h3>Para qué los usamos</h3>
+    <p>Para atender tus órdenes, contactarte por WhatsApp o correo sobre tu compra y, si lo aceptas, avisarte de camionetas nuevas.</p>
+    <h3>Con quién los compartimos</h3>
+    <p>No vendemos tus datos. Solo los compartimos con quienes participan en tu compra, como la subasta, el concesionario, la naviera y el agente aduanal, y solo lo necesario para hacerla.</p>
+    <h3>Dónde se guardan</h3>
+    <p>Tu cuenta, tus favoritas y tus órdenes se guardan en tu propio teléfono, en la memoria del navegador. Lo que nos envías por WhatsApp o correo queda en esas conversaciones.</p>
+    <h3>Tus derechos</h3>
+    <p>Puedes pedirnos en cualquier momento que corrijamos o borremos tus datos, escribiéndonos por WhatsApp o a Importa2desdeusa@gmail.com.</p>
+    <h3>Menores de edad</h3>
+    <p>El app está dirigido a personas mayores de 18 años.</p>
+    <h3>Cambios</h3>
+    <p>Si cambiamos esta política, lo indicaremos en el app con la nueva fecha de actualización.</p>
+    <h3>Contacto</h3>
+    <p>Importadora VIMO LLC (Importa2) · 43 E 17th St, St. Cloud, FL 34769 · +1 (689) 339-2098 · Importa2desdeusa@gmail.com</p>
+  </section>
+  <div style="height:30px"></div>
+</div>
+
 <!-- CONTACTO -->
 <div class="view" id="v-contacto">
   <div class="top"><div class="hello"><small>Estamos para ti</small><span>Contacto</span></div>
@@ -570,6 +631,7 @@ nav .wa svg{stroke:#1FA855}
       <div class="field reg"><label>¿Dónde la recibes?</label><select id="rCiudad"><option>Caracas</option><option>Margarita</option><option>Otra ciudad de Venezuela</option></select></div>
       <div class="field reg"><label>Eres…</label><select id="rTipo"><option>Comprador para mí</option><option>Compro para revender</option><option>Concesionario o rent a car</option></select></div>
       <button class="btn gold" type="submit" id="authBtn">Crear mi cuenta</button>
+      <p style="font-size:11.5px;color:var(--muted);text-align:center;margin-top:10px;line-height:1.45">Al continuar aceptas los <a onclick="cerrar('registro');irA('legal')" style="color:var(--blue);cursor:pointer">Términos y la Política de privacidad</a>.</p>
     </form>
   </div>
 </div>
@@ -848,9 +910,10 @@ function pintarPerfil(){
   <div class="box"><div class="saldo"><div><small style="font-size:12px;color:var(--muted);display:block">Tus Millas Importa2</small><b>${(usuario.millas??100).toLocaleString('es-VE')}</b></div><span style="font-size:12px;color:var(--gold);font-weight:700;text-align:right">Canjéalas con<br>tu asesor</span></div></div>
   <div class="box"><button class="btn line" onclick="pedirAvisos()">Activar avisos de camionetas nuevas</button></div>
   <div class="box"><button class="btn line" onclick="abrir('requisitos')">Requisitos para nacionalizar</button></div>
+  <div class="box"><button class="btn line" onclick="irA('legal')">Términos y privacidad</button></div>
   <section style="padding:14px 0"><button class="btn" style="background:#fff;color:var(--muted);border:1px solid var(--line)" onclick="usuario=null;guardar();refrescar();irA('inicio')">Cerrar sesión</button></section>`;
 }
-/* ===== AUTH (boceto: se guarda solo en este teléfono) ===== */
+/* ===== AUTH (por ahora se guarda solo en este teléfono) ===== */
 let modo='reg';
 function modoAuth(m){modo=m;$('#tabReg').classList.toggle('on',m==='reg');$('#tabIn').classList.toggle('on',m==='in');document.querySelectorAll('.field.reg').forEach(f=>f.style.display=m==='reg'?'':'none');$('#authTitle').textContent=m==='reg'?'Crea tu cuenta':'Bienvenido de nuevo';$('#authBtn').textContent=m==='reg'?'Crear mi cuenta':'Entrar';}
 function registrar(e){
