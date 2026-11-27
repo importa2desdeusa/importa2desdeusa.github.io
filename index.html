@@ -645,7 +645,7 @@ const COSTOS = {
   servicioConces: 3000,    // gestión Importa2, concesionario (va dentro del precio de la compra)
   envioTierra: 2999,       // envío a tierra firme
   envioMargarita: 3399,    // envío a Margarita
-  comisionSubasta: 0.10,   // comisión estimada de la subasta (por confirmar con el broker)
+  comisionSubasta: 0.075,  // arriba de $15,000 Copart e IAA cobran 7.5% (título no limpio, fondos seguros)
   broker: 500              // broker de subasta, lo paga el cliente
 };
 const WA = '16893392098';
@@ -849,11 +849,18 @@ function ficha(id){
   window.scrollTo(0,0);
 }
 function tick(){ const e=$('#count'); if(!e||!actual) return clearInterval(timerInt); const r=restante(actual.cierra); e.innerHTML=[[r.d,'DÍAS'],[r.h,'HORAS'],[r.m,'MIN'],[r.s,'SEG']].map(([n,l])=>`<div><b>${String(n).padStart(2,'0')}</b><small>${l}</small></div>`).join(''); }
+/* Comisión de Copart/IAA según su tabla pública (título no limpio, fondos seguros) + puja en línea + gate $95 + ambiental $15 */
+const TABLA_SUB=[[50,25],[100,45],[200,80],[300,130],[400,145],[500,185],[600,210],[700,240],[800,270],[900,295],[1000,320],[1500,430],[2000,510],[2500,570],[3000,610],[3500,655],[4000,705],[4500,725],[5000,750],[5500,775],[6000,800],[6500,825],[7000,845],[7500,880],[8000,900],[8500,925],[10000,945],[15000,1000]];
+function feeSubasta(p){
+  let f=p>=15000?p*COSTOS.comisionSubasta:(TABLA_SUB.find(t=>p<t[0])||[0,1000])[1];
+  const bid=p<100?0:p<500?50:p<1000?65:p<1500?85:p<2000?95:p<4000?110:p<6000?125:p<8000?145:160;
+  return Math.round(f+bid+95+15);
+}
 function calcular(){
   const c=actual; if(!c) return;
   const sub=c.cat!=='conces';
   const puja=$('#cPuja')?(+$('#cPuja').value||0):c.puja;
-  const com=sub?puja*COSTOS.comisionSubasta:0; if(!puja){$('#lines').innerHTML='<div class="calc note" style="font-size:13px;color:var(--muted)">Escribe un precio aproximado y te sale el total con el envío incluido.</div>';return}
+  const com=sub?feeSubasta(puja):0; if(!puja){$('#lines').innerHTML='<div class="calc note" style="font-size:13px;color:var(--muted)">Escribe un precio aproximado y te sale el total con el envío incluido.</div>';return}
   const serv=sub?COSTOS.servicioSubasta:COSTOS.servicioConces;
   const dest=$('#cDest')?$('#cDest').value:'tierra';
   const envio=dest==='margarita'?COSTOS.envioMargarita:COSTOS.envioTierra;
