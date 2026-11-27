@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
 <title>Importa2 · Tu carro o camioneta llave en mano</title>
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B1F3F">
@@ -44,13 +44,12 @@ section{padding:20px 20px 0}
 .h a{font-size:13px;color:var(--blue);font-weight:600}
 .brands{display:flex;gap:10px;overflow-x:auto;scrollbar-width:none;padding-bottom:2px}
 .brands::-webkit-scrollbar,.rail::-webkit-scrollbar{display:none}
-.brandchip{flex:0 0 auto;background:#fff;border:1px solid var(--line);border-radius:16px;padding:12px 14px;min-width:96px;text-align:left}
-.brandchip.on{border-color:var(--navy);background:var(--navy);color:#fff}
-.brandchip .ic{width:30px;height:30px;border-radius:10px;background:#EEF2FA;display:grid;place-items:center;margin-bottom:8px}
-.brandchip.on .ic{background:rgba(255,255,255,.12)}
-.brandchip b{display:block;font-size:14px}
-.brandchip small{font-size:12px;color:var(--muted)}
-.brandchip.on small{color:#A9B6CF}
+.brandchip{flex:0 0 auto;position:relative;width:104px;height:156px;border-radius:16px;overflow:hidden;background:#0B1F3F center/cover no-repeat;border:0;padding:0;box-shadow:0 6px 16px rgba(11,31,63,.18)}
+.brandchip.on{outline:3px solid var(--gold);outline-offset:2px}
+.brandchip small{position:absolute;left:0;right:0;bottom:0;padding:22px 6px 9px;font-size:11.5px;font-weight:700;color:#fff;text-align:center;background:linear-gradient(transparent,rgba(5,14,35,.85))}
+.brandchip.todas{background:radial-gradient(circle at 50% 45%,#1f5fd1,#0B1F3F 75%)}
+.brandchip.todas .ti{position:absolute;top:34%;left:50%;transform:translate(-50%,-50%);text-align:center;color:#fff;font-weight:800;font-size:14px}
+.brandchip.todas img{width:54px;height:54px;border-radius:14px;display:block;margin:0 auto 6px;box-shadow:0 0 18px rgba(242,201,76,.45)}
 /* cintillo video */
 .cint{position:relative;margin:16px 20px 0;border-radius:22px;overflow:hidden;aspect-ratio:16/9;background:#0B1F3F url(img/cintillo-inicio.jpg) center/cover;box-shadow:0 10px 26px rgba(11,31,63,.25)}
 .cint video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
@@ -134,9 +133,19 @@ section{padding:20px 20px 0}
 .step b{font-size:14px;color:var(--navy)} .step p{font-size:12.5px;color:var(--muted);margin-top:2px;line-height:1.4}
 /* instalar */
 .instpill{background:var(--gold);color:var(--navy);font-weight:800;font-size:12px;padding:9px 12px;border-radius:999px;display:flex;align-items:center;gap:6px;white-space:nowrap}
+.inst.arriba{align-items:flex-start}.inst.abajo{align-items:flex-end}
+.inst .ib{display:flex;align-items:center;gap:12px;background:linear-gradient(135deg,#0B1F3F,#163a78);color:#fff;border-radius:18px;padding:14px 14px;font-size:14.5px;line-height:1.4;text-align:left;box-shadow:0 12px 30px rgba(0,0,0,.35);border:1.5px solid var(--gold)}
+.inst .ib img{width:44px;height:44px;border-radius:11px;flex:none}
+.inst .ib div{flex:1}.inst .ib b{color:#F2C94C}
+.inst .ib .sym{background:rgba(255,255,255,.15)!important}
+.inst .ib .sym svg{stroke:#fff!important}
+.inst .ib button{flex:none;color:#A9B6CF;font-size:16px;padding:4px 6px}
+.inst .flecha2{text-align:center;font-size:40px;font-weight:900;color:#F2C94C;animation:fl 1s ease-in-out infinite;text-shadow:0 2px 8px rgba(0,0,0,.4)}
+.inst.arriba .flecha2{position:absolute;top:2px;right:18px}
+.inst.arriba .card{margin-top:46px}
 .inst{position:fixed;inset:0;background:rgba(11,31,63,.62);z-index:80;display:none;align-items:flex-end;justify-content:center}
 .inst.on{display:flex}
-.inst .card{background:#fff;width:100%;max-width:440px;border-radius:26px 26px 0 0;padding:26px 22px calc(24px + env(safe-area-inset-bottom));text-align:center;animation:instUp .35s cubic-bezier(.2,.9,.3,1.1)}
+.inst .card{background:transparent!important;box-shadow:none!important;width:100%;max-width:440px;border-radius:26px 26px 0 0;padding:26px 22px calc(24px + env(safe-area-inset-bottom));text-align:center;animation:instUp .35s cubic-bezier(.2,.9,.3,1.1)}
 @keyframes instUp{from{transform:translateY(40px);opacity:0}to{transform:none;opacity:1}}
 .inst .ic{width:88px;height:88px;border-radius:22px;box-shadow:0 10px 24px rgba(11,31,63,.25);margin:0 auto 14px;display:block}
 .inst h2{font-family:var(--serif);color:var(--navy);font-size:25px;font-weight:600}
@@ -150,7 +159,9 @@ section{padding:20px 20px 0}
 .inst .flecha{font-size:30px;color:var(--gold);animation:bajar 1s ease-in-out infinite alternate;margin-top:4px}
 @keyframes bajar{to{transform:translateY(8px)}}
 /* panel */
-html,body{overflow-x:hidden}
+html,body{overflow-x:hidden;max-width:100vw;overscroll-behavior-x:none}
+body{touch-action:pan-y pinch-zoom}
+.pw{position:relative}.pw input{padding-right:46px!important}.pw button{position:absolute;right:6px;top:50%;transform:translateY(-50%);padding:8px;color:var(--muted)}
 #panelBox{min-width:0}
 #panelBox .box{overflow-wrap:anywhere;min-width:0}
 #panelBox .seg button{padding:9px 4px;font-size:12px;white-space:nowrap}
@@ -243,7 +254,29 @@ nav .wa svg{stroke:#1FA855}
 .btn{display:block;width:100%;text-align:center;background:var(--navy);color:#fff;border-radius:14px;padding:14px;font-weight:700;font-size:15px}
 .btn.gold{background:var(--gold);color:var(--navy)}
 .btn.line{background:#fff;border:1.5px solid var(--navy);color:var(--navy)}
+.flecha{position:fixed;font-size:54px;color:var(--gold);font-weight:900;animation:fl 1s ease-in-out infinite;text-shadow:0 2px 8px rgba(0,0,0,.3)}
+.flecha.arriba{top:6px;right:14px}.flecha.abajo{bottom:10px;right:14px}
+@keyframes fl{50%{transform:translateY(-8px)}}
+.desl{font-size:12px;font-weight:700;color:var(--gold)}
+.miniw{position:relative}
+.miniw:after{content:"";position:absolute;top:0;right:0;bottom:4px;width:44px;background:linear-gradient(90deg,rgba(244,246,250,0),#F4F6FA);pointer-events:none;transition:opacity .2s}
+.miniw.fin:after,.miniw.fin .mflecha{opacity:0;pointer-events:none}
+.mflecha{position:absolute;right:4px;top:50%;transform:translateY(-50%);z-index:2;width:34px;height:34px;border-radius:50%;background:var(--gold);color:var(--navy);font-size:22px;font-weight:800;line-height:1;box-shadow:0 4px 12px rgba(11,31,63,.3);animation:empuja 1.4s ease-in-out infinite;transition:opacity .2s}
+@keyframes empuja{50%{transform:translate(4px,-50%)}}
+.mini{display:flex;gap:10px;overflow-x:auto;scrollbar-width:none;padding-bottom:4px}
+.mini::-webkit-scrollbar{display:none}
+.mc{flex:0 0 31%;min-width:108px;background:#fff;border:1px solid var(--line);border-radius:14px;overflow:hidden;cursor:pointer}
+.mc .mp{height:72px;background:#E9EDF3 center/cover}
+.mc .mt{padding:7px 8px 9px;font-size:11px;line-height:1.3}
+.mc .mt b{display:block;color:var(--navy);font-size:12px}
+.mc .mt span{display:block;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mc .mt em{display:block;font-style:normal;font-weight:800;color:var(--navy);margin-top:3px}
 .svcs{display:grid;gap:10px}
+.svcg{font-size:11.5px;font-weight:800;letter-spacing:.08em;color:var(--gold);text-transform:uppercase;margin:16px 0 8px}
+.svcg:first-child{margin-top:0}
+.svcmodo{display:flex;gap:6px;flex-wrap:wrap;margin:-4px 0 4px 4px}
+.svcmodo button{font-size:12px;padding:7px 10px;border-radius:20px;border:1.5px solid var(--line);background:#fff;color:var(--navy)}
+.svcmodo button.on{border-color:var(--navy);background:var(--navy);color:#fff}
 .svc{display:flex;align-items:center;gap:10px;width:100%;text-align:left;background:#fff;border:1.5px solid var(--line);border-radius:14px;padding:12px 14px;font-size:14px;color:var(--navy)}
 .svc div{flex:1}.svc small{display:block;color:var(--muted);font-size:12px;margin-top:2px;font-weight:400}
 .svc .add{flex:none;font-size:12.5px;font-weight:700;color:var(--navy);background:var(--bg);border-radius:20px;padding:7px 12px}
@@ -393,6 +426,8 @@ nav .wa svg{stroke:#1FA855}
     <p style="margin-top:14px;font-size:12.5px;color:#A9B6CF;line-height:1.5">Esta es nuestra selección de camionetas de hoy. ¿Quieres otra camioneta, o algún carro, que no veas aquí? Dinos cuál y te lo cotizamos con gusto.</p>
   </div>
 
+
+
   <div class="cint" id="cint">
     <img id="cvid" alt="Camionetas Importa2 llegando al puerto" src="img/cintillo-inicio.jpg" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover">
   </div>
@@ -407,26 +442,13 @@ nav .wa svg{stroke:#1FA855}
   </section>
 
 
-  <section>
-    <div class="h"><h2 id="railTitle">Camionetas en subasta</h2><a onclick="irA('buscar')">Ver todas</a></div>
+  <section id="railSec" style="display:none">
+    <div class="h"><h2 id="railTitle">Camionetas en subasta</h2></div>
     <p id="actLine" style="font-size:12px;color:var(--muted);margin:-6px 0 12px"></p>
     <div class="rail" id="rail"></div>
   </section>
 
-  <section>
-    <button class="pais" style="margin:0;width:100%;text-align:left;border:1.5px solid var(--gold);display:block" onclick="irA('flotas')">
-      <em>para empresas</em>
-      <h3 style="font-size:22px;margin:4px 0 6px">¿Compras varios carros o camionetas?</h3>
-      <p>Rent a car, concesionarios, revendedores y flotas de empresa. Te armamos una cotización a la medida, desde 3 unidades.</p>
-      <span style="display:inline-block;margin-top:12px;background:var(--gold);color:var(--navy);font-weight:700;font-size:13.5px;padding:10px 16px;border-radius:12px">Flotillas y empresas ›</span>
-    </button>
-  </section>
 
-  <section>
-    <div class="hero" style="background-image:url(img/portada.jpg)">
-      <div class="tx"><em>de Estados Unidos</em><h3>A TU PUERTA EN VENEZUELA</h3><p>Escoges, la compramos por ti y te la entregamos llave en mano.</p></div>
-    </div>
-  </section>
 
   <section>
     <div class="h"><h2>Así de fácil</h2></div>
@@ -452,22 +474,11 @@ nav .wa svg{stroke:#1FA855}
   </section>
 
   <section>
-    <div class="mil">
+    <div class="mil" style="padding:18px 20px">
       <em>cada camioneta te premia</em>
       <h3>MILLAS IMPORTA2</h3>
-      <p>Con cada camioneta que compras con nosotros acumulas millas, y las cambias por servicios para tu camioneta.</p>
-      <h4>Así ganas millas</h4>
-      <div class="mrow">Al crear tu cuenta<b>100 millas</b></div>
-      <div class="mrow">Por cada camioneta que compras<b>1,000 millas</b></div>
-      <div class="mrow">Por cada servicio adicional<b>200 millas</b></div>
-      <div class="mrow">Por completar tus 3 pagos a tiempo<b>300 millas</b></div>
-      <h4>Así las usas</h4>
-      <div class="mrow">Papel ahumado<b>500 millas</b></div>
-      <div class="mrow">Grúa hasta tu casa<b>1,000 millas</b></div>
-      <div class="mrow">Pantalla CarPlay instalada<b>2,000 millas</b></div>
-      <div class="mrow">Equipo de sonido RM Pro<b>3,000 millas</b></div>
-      <button class="btn gold" id="milBtn" onclick="usuario?irA('perfil'):abrir('registro')">Crea tu cuenta y recibe 100 millas</button>
-      <small class="fine">Las millas se suman cuando tu compra se completa y duran 12 meses. Para canjearlas, pídeselo a tu asesor.</small>
+      <p>Compra, acumula millas y cámbialas por servicios para tu camioneta.</p>
+      <button class="btn gold" onclick="irA('millas')">Mis millas ›</button>
     </div>
   </section>
 
@@ -503,6 +514,15 @@ nav .wa svg{stroke:#1FA855}
     <div id="contactoHome"></div>
   </section>
 
+  <section>
+    <button class="pais" style="margin:0;width:100%;text-align:left;border:1.5px solid var(--gold);display:block" onclick="irA('flotas')">
+      <em>para empresas</em>
+      <h3 style="font-size:22px;margin:4px 0 6px">¿Compras varios carros o camionetas?</h3>
+      <p>Rent a car, concesionarios, revendedores y flotas de empresa. Te armamos una cotización a la medida, desde 3 unidades.</p>
+      <span style="display:inline-block;margin-top:12px;background:var(--gold);color:var(--navy);font-weight:700;font-size:13.5px;padding:10px 16px;border-radius:12px">Flotillas y empresas ›</span>
+    </button>
+  </section>
+
   <div style="text-align:center;font-size:12px;color:var(--muted);padding:26px 20px 6px;line-height:1.8">
     <a onclick="irA('legal');setTimeout(()=>document.getElementById('terminos').scrollIntoView(),50)" style="color:var(--muted);text-decoration:underline;cursor:pointer">Términos y condiciones</a> · <a onclick="irA('legal');setTimeout(()=>document.getElementById('privacidad').scrollIntoView(),50)" style="color:var(--muted);text-decoration:underline;cursor:pointer">Política de privacidad</a><br>© Importa2 · Importadora VIMO LLC · St. Cloud, Florida
   </div>
@@ -512,8 +532,8 @@ nav .wa svg{stroke:#1FA855}
 <!-- BUSCAR -->
 <div class="view" id="v-buscar">
   <div class="top"><div class="hello"><small>Catálogo</small><span>Todas las camionetas</span></div>
-    <div class="search"><input id="q2" placeholder="Modelo, año…" oninput="pintarBuscar()"></div></div>
-  <section><div class="grid" id="gridBuscar"></div></section>
+    <div class="search"><input id="q2" placeholder="Busca tu próxima camioneta aquí" oninput="pintarBuscar()"></div></div>
+  <div id="gridBuscar"></div>
 </div>
 
 <!-- FAVORITOS -->
@@ -644,6 +664,30 @@ nav .wa svg{stroke:#1FA855}
 
 <!-- FICHA -->
 <div class="view ficha" id="v-ficha"></div>
+<div class="view" id="v-millas">
+  <div class="top"><div class="top-row"><button class="iconbtn" onclick="atras()" aria-label="Volver"><svg width="18" height="18" fill="none" stroke="#fff" stroke-width="2"><path d="M11 4L6 9l5 5"/></svg></button></div><div class="hello" style="margin-top:10px"><small>Programa de recompensas</small><span>Mis millas</span></div></div>
+  <div id="milSaldo"></div>
+  <section>
+    <div class="mil">
+      <em>cada camioneta te premia</em>
+      <h3>MILLAS IMPORTA2</h3>
+      <p>Con cada camioneta que compras con nosotros acumulas millas, y las cambias por servicios para tu camioneta.</p>
+      <h4>Así ganas millas</h4>
+      <div class="mrow">Al crear tu cuenta<b>100 millas</b></div>
+      <div class="mrow">Por cada camioneta que compras<b>1,000 millas</b></div>
+      <div class="mrow">Por cada servicio adicional<b>200 millas</b></div>
+      <div class="mrow">Por completar tus 3 pagos a tiempo<b>300 millas</b></div>
+      <h4>Así las usas</h4>
+      <div class="mrow">Papel ahumado<b>500 millas</b></div>
+      <div class="mrow">Grúa hasta tu casa<b>1,000 millas</b></div>
+      <div class="mrow">Pantalla CarPlay instalada<b>2,000 millas</b></div>
+      <div class="mrow">Equipo de sonido RM Pro<b>3,000 millas</b></div>
+      <button class="btn gold" id="milBtn" onclick="usuario?irA('perfil'):abrir('registro')">Crea tu cuenta y recibe 100 millas</button>
+      <small class="fine">Las millas se suman cuando tu compra se completa y duran 12 meses. Para canjearlas, pídeselo a tu asesor.</small>
+    </div>
+  </section>
+  <div style="height:30px"></div>
+</div>
 <div class="view" id="v-resumen"></div>
 <div class="view" id="v-pagar"></div>
 
@@ -667,7 +711,7 @@ nav .wa svg{stroke:#1FA855}
       <div class="field reg"><label>Nombre y apellido</label><input id="rNombre" autocomplete="name"></div>
       <div class="field reg"><label>WhatsApp</label><input id="rWa" type="tel" placeholder="+58 4xx xxx xxxx" autocomplete="tel"></div>
       <div class="field"><label>Correo</label><input id="rMail" type="email" required autocomplete="email"></div>
-      <div class="field"><label>Contraseña</label><input id="rPass" type="password" required minlength="6"></div>
+      <div class="field"><label>Contraseña</label><div class="pw"><input id="rPass" type="password" required minlength="6"><button type="button" aria-label="Ver contraseña" onclick="const i=$('#rPass');const v=i.type==='password';i.type=v?'text':'password';this.innerHTML=v?OJO_NO:OJO"></button></div></div>
       <div class="field reg"><label>¿Dónde la recibes?</label><select id="rCiudad"><option>Caracas</option><option>Margarita</option><option>Otra ciudad de Venezuela</option></select></div>
       <div class="field reg"><label>Eres…</label><select id="rTipo"><option>Comprador para mí</option><option>Compro para revender</option><option>Concesionario o rent a car</option></select></div>
       <button class="btn gold" type="submit" id="authBtn">Crear mi cuenta</button>
@@ -726,11 +770,12 @@ const MODELOS=[
   ['Jeep','Grand Cherokee','img/grand-cherokee.jpg',3600,'3.6L V6','2023'],
   ['Jeep','Gladiator','img/gladiator.jpg',3600,'3.6L V6','2023']
 ];
+const ESTIMADO={'4Runner':36000,'Land Cruiser':55000,'Tacoma':30000,'Tundra':40000,'Sequoia':55000,'RAV4':25000,'Corolla Cross':22000,'Corolla':18000,'Silverado':32000,'Tahoe':45000,'Suburban':48000,'Colorado':26000,'Bronco':35000,'Wrangler':28000,'Grand Cherokee':30000,'Gladiator':30000};
 let _id=100;
 MODELOS.forEach(([marca,mod,img,cc,motor,desde])=>{
-  CAMIONETAS.push({id:_id++,cat:'privada',marca,mod,an:desde+'–2026',img,lugar:'Subastas de dealers',orig:'Privada',sub:'Por encargo',puja:null,mi:'Según el lote',dano:'Sin daños o leves',motor,trac:'Según versión',trans:'Automática',comb:'Gasolina',cc,cierra:null});
+  CAMIONETAS.push({id:_id++,cat:'privada',marca,mod,an:desde+'–2026',img,lugar:'Subastas de dealers',orig:'Privada',sub:'Por encargo',puja:null,aprox:ESTIMADO[mod]||null,mi:'Según el lote',dano:'Sin daños o leves',motor,trac:'Según versión',trans:'Automática',comb:'Gasolina',cc,cierra:null});
 });
-let filtroCat='publica';
+let filtroCat=null;
 
 /* ===== CATÁLOGO REAL: lo carga sola la tarea de las 9 de la noche ===== */
 (function(){
@@ -783,6 +828,9 @@ async function cargarCuenta(){
 }
 
 const $=s=>document.querySelector(s);
+const OJO='<svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M1.5 11S5 4.5 11 4.5 20.5 11 20.5 11 17 17.5 11 17.5 1.5 11 1.5 11z"/><circle cx="11" cy="11" r="3"/></svg>';
+const OJO_NO='<svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M1.5 11S5 4.5 11 4.5 20.5 11 20.5 11 17 17.5 11 17.5 1.5 11 1.5 11z"/><circle cx="11" cy="11" r="3"/><path d="M3 3l16 16"/></svg>';
+document.addEventListener('DOMContentLoaded',()=>{ const b=document.querySelector('.pw button'); if(b) b.innerHTML=OJO; });
 const usd=n=>'$'+Math.round(n).toLocaleString('es-VE');
 function toast(t){let e=$('#toast'); if(!e){e=document.createElement('div');e.className='toast';e.id='toast';document.body.appendChild(e);}e.textContent=t;e.classList.add('on');clearTimeout(e._t);e._t=setTimeout(()=>e.classList.remove('on'),2600)}
 
@@ -791,12 +839,13 @@ const SIL='<svg width="90" height="40" viewBox="0 0 90 40" fill="none" stroke="#
 function linkLote(c){ if(c.url) return c.url; if(c.sub==='Copart') return 'https://www.copart.com/lot/'+c.lote; return 'https://www.iaai.com/Search?Keyword='+encodeURIComponent(c.lote); }
 const IC = {
   Toyota:'<svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M2 12l2-5h10l2 5v3H2z"/><circle cx="5.5" cy="15" r="1.5"/><circle cx="12.5" cy="15" r="1.5"/></svg>',
-  todas:'<svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="2" y="2" width="6" height="6" rx="1.5"/><rect x="10" y="2" width="6" height="6" rx="1.5"/><rect x="2" y="10" width="6" height="6" rx="1.5"/><rect x="10" y="10" width="6" height="6" rx="1.5"/></svg>'
+  todas:'<img src="img/icon-192.png?v=3" alt="Todas" style="width:30px;height:30px;border-radius:9px;object-fit:cover">'
 };
 function pintarMarcas(){
   $('#brands').innerHTML = MARCAS.map(m=>{
-    const base=CAMIONETAS.filter(x=>x.cat===filtroCat); const c = m.id==='todas'?base.length:base.filter(x=>x.marca===m.id).length;
-    return `<button class="brandchip ${filtroMarca===m.id?'on':''}" onclick="filtroMarca='${m.id}';pintarMarcas();filtrar()"><div class="ic">${IC[m.id]||IC.Toyota}</div><b>${m.n}</b><small>${c} camioneta${c===1?'':'s'}</small></button>`}).join('');
+    const base=filtroCat?CAMIONETAS.filter(x=>x.cat===filtroCat):CAMIONETAS; const c = m.id==='todas'?base.length:base.filter(x=>x.marca===m.id).length;
+    const LG={Toyota:'toyota',Chevrolet:'chevrolet',Ford:'ford',Jeep:'jeep'}[m.id];
+    return `<button class="brandchip ${LG?'':'todas'} ${filtroMarca===m.id?'on':''}" aria-label="${m.n}" style="${LG?`background-image:url(img/marca-${LG}.jpg?v=2)`:''}" onclick="filtroMarca='${m.id}';pintarMarcas();if(!filtroCat){toast('Ahora escoge dónde quieres comprar');document.getElementById('cats').scrollIntoView({behavior:'smooth',block:'center'})}else{filtrar();document.getElementById('railTitle').scrollIntoView({behavior:'smooth',block:'start'})}">${LG?'':'<div class="ti"><img src="img/icon-192.png?v=3" alt="">Todas</div>'}<small>${c} camioneta${c===1?'':'s'}</small></button>`}).join('');
 }
 function restante(t){ if(!t) return null; const ms=Math.max(0,t-Date.now()); const d=Math.floor(ms/D),h=Math.floor(ms%D/H),m=Math.floor(ms%H/60e3),s=Math.floor(ms%60e3/1e3); return {d,h,m,s,txt:d?`${d}d ${h}h`:`${h}h ${m}m`}; }
 function card(c){
@@ -809,14 +858,18 @@ function card(c){
       ${c.img?'<span class="ref">Foto referencial</span>':''}
     </div>
     <div class="cb"><h4>${c.an} ${c.marca} ${c.mod}</h4><div class="meta">${c.cat==='publica'?`Lote ${c.lote} · ${c.lugar} · ${c.mi}`:c.cat==='privada'?'Manheim, ADESA y más · '+c.trac:`${c.lugar} · ${c.trac}`}</div>
-      <div class="pr"><div><small>${c.cat==='publica'?(c.firme?'Compra inmediata':'Puja actual'):'Precio'}</small><b>${c.puja?usd(c.puja):'Se cotiza'}</b></div>
+      <div class="pr"><div><small>${c.cat==='publica'?(c.firme?'Compra inmediata':'Puja actual'):c.aprox?'Desde aprox. (se cotiza)':'Precio'}</small><b>${c.puja?usd(c.puja):c.aprox?usd(c.aprox):'Se cotiza'}</b></div>
       <div class="lock">${usuario?'Ver total puesta<br>en Venezuela →':'Crea tu cuenta para ver<br>el total en Venezuela'}</div></div></div></div>`;
 }
 function heart(on){return `<svg width="18" height="18" fill="${on?'#C9A24A':'none'}" stroke="${on?'#C9A24A':'#0B1F3F'}" stroke-width="1.8"><path d="M9 15.5s-6-3.8-6-8.1A3.4 3.4 0 019 5.6a3.4 3.4 0 016 1.8c0 4.3-6 8.1-6 8.1z"/></svg>`}
 function lista(q,todas){ q=(q||'').toLowerCase(); return CAMIONETAS.filter(c=>(todas||c.cat===filtroCat)&&(filtroMarca==='todas'||c.marca===filtroMarca)&&(`${c.an} ${c.marca} ${c.mod}`.toLowerCase().includes(q))); }
-function pintarCats(){ const ic={publica:'<svg width="22" height="22" fill="none" stroke="#C9A24A" stroke-width="1.8"><path d="M4 18h10M6 14l6-6M9 5l5 5M11 3l6 6"/></svg>',privada:'<svg width="22" height="22" fill="none" stroke="#C9A24A" stroke-width="1.8"><rect x="4" y="9" width="14" height="10" rx="2"/><path d="M7 9V6a4 4 0 018 0v3"/></svg>',conces:'<svg width="22" height="22" fill="none" stroke="#C9A24A" stroke-width="1.8"><path d="M3 19V9l8-5 8 5v10"/><path d="M7 19v-5h8v5"/></svg>',flotas:'<svg width="22" height="22" fill="none" stroke="#C9A24A" stroke-width="1.8"><path d="M2 15v-3l2-4h7l2 4v3z"/><circle cx="5" cy="15.5" r="1.5"/><circle cx="10" cy="15.5" r="1.5"/><path d="M9 8l1.5-3h7l2 4v3h-6"/><circle cx="17" cy="12.5" r="1.5"/></svg>'}; $('#cats').innerHTML=CATS.map(c=>c.id==='flotas'?`<button class="cat" style="border-color:var(--gold)" onclick="irA('flotas')"><div class="ci">${ic[c.id]}</div><div><b>${c.n}</b><small>${c.d}</small></div><span class="arr">›</span></button>`:`<button class="cat ${filtroCat===c.id?'on':''}" onclick="filtroCat='${c.id}';filtroMarca='todas';pintarCats();pintarMarcas();filtrar();document.getElementById('railTitle').scrollIntoView({behavior:'smooth',block:'center'})"><div class="ci">${ic[c.id]}</div><div><b>${c.n}</b><small>${c.d}</small></div><span class="arr">›</span></button>`).join(''); $('#railTitle').textContent=CATS.find(c=>c.id===filtroCat).t; }
-function filtrar(){ const l=lista($('#q').value).sort((a,b)=>(a.cierra||9e15)-(b.cierra||9e15)); $('#rail').innerHTML=l.length?l.map(card).join(''):'<div class="empty">No hay camionetas con ese filtro. Escríbenos y te la buscamos.</div>'; }
-function pintarBuscar(){ const l=lista($('#q2').value,true); $('#gridBuscar').innerHTML=l.map(card).join('')||'<div class="empty">No la tenemos cargada. Escríbenos y te la buscamos.</div>'; }
+function pintarCats(){ const ic={publica:'<svg width="22" height="22" fill="none" stroke="#C9A24A" stroke-width="1.8"><path d="M4 18h10M6 14l6-6M9 5l5 5M11 3l6 6"/></svg>',privada:'<svg width="22" height="22" fill="none" stroke="#C9A24A" stroke-width="1.8"><rect x="4" y="9" width="14" height="10" rx="2"/><path d="M7 9V6a4 4 0 018 0v3"/></svg>',conces:'<svg width="22" height="22" fill="none" stroke="#C9A24A" stroke-width="1.8"><path d="M3 19V9l8-5 8 5v10"/><path d="M7 19v-5h8v5"/></svg>',flotas:'<svg width="22" height="22" fill="none" stroke="#C9A24A" stroke-width="1.8"><path d="M2 15v-3l2-4h7l2 4v3z"/><circle cx="5" cy="15.5" r="1.5"/><circle cx="10" cy="15.5" r="1.5"/><path d="M9 8l1.5-3h7l2 4v3h-6"/><circle cx="17" cy="12.5" r="1.5"/></svg>'}; $('#cats').innerHTML=CATS.map(c=>c.id==='flotas'?`<button class="cat" style="border-color:var(--gold)" onclick="irA('flotas')"><div class="ci">${ic[c.id]}</div><div><b>${c.n}</b><small>${c.d}</small></div><span class="arr">›</span></button>`:`<button class="cat ${filtroCat===c.id?'on':''}" onclick="filtroCat='${c.id}';pintarCats();pintarMarcas();filtrar();document.getElementById('railTitle').scrollIntoView({behavior:'smooth',block:'start'})"><div class="ci">${ic[c.id]}</div><div><b>${c.n}</b><small>${c.d}</small></div><span class="arr">›</span></button>`).join(''); if(filtroCat) $('#railTitle').textContent=CATS.find(c=>c.id===filtroCat).t; }
+function filtrar(){ const q=$('#q').value.trim(), sec=$('#railSec'); if(!filtroCat&&!q){ sec.style.display='none'; return; } sec.style.display=''; if(!filtroCat) $('#railTitle').textContent='Resultados'; const l=lista(q,!filtroCat).sort((a,b)=>(a.cierra||9e15)-(b.cierra||9e15)); $('#rail').innerHTML=l.length?l.map(card).join(''):'<div class="empty">No hay camionetas con ese filtro. Escríbenos y te la buscamos.</div>'; }
+function pintarBuscar(){ const q=$('#q2').value; let h='';
+  CATS.filter(c=>c.id!=='flotas').forEach(cat=>{ const l=CAMIONETAS.filter(c=>c.cat===cat.id&&`${c.an} ${c.marca} ${c.mod}`.toLowerCase().includes(q.toLowerCase())); if(!l.length) return;
+    h+=`<section style="padding-bottom:4px"><div class="h"><h2 style="font-size:18px">${cat.id==='conces'?'Concesionarios 0 km':cat.n} <span style="font-size:12px;color:var(--muted);font-family:var(--sans)">(${l.length})</span></h2>${l.length>3?'<span class="desl">Desliza para ver más ›</span>':''}</div><div class="miniw"><div class="mini" onscroll="this.parentNode.classList.toggle('fin',this.scrollLeft+this.clientWidth>=this.scrollWidth-4)">${l.map(mini).join('')}</div>${l.length>3?'<button class="mflecha" onclick="this.previousElementSibling.scrollBy({left:this.previousElementSibling.clientWidth*.9,behavior:\'smooth\'})" aria-label="Ver más">›</button>':''}</div></section>`; });
+  $('#gridBuscar').innerHTML=h||'<section><div class="empty">No la tenemos cargada. Escríbenos y te la buscamos.</div></section>'; }
+function mini(c){ return `<div class="mc" onclick="ficha(${c.id})"><div class="mp" style="${c.img?`background-image:url(${c.img}?v=2)`:''}"></div><div class="mt"><b>${c.an} ${c.marca}</b><span>${c.mod}</span><em>${c.puja?usd(c.puja):c.aprox?'Aprox. '+usd(c.aprox):'Se cotiza'}</em></div></div>`; }
 function pintarFavs(){ const l=CAMIONETAS.filter(c=>favs.has(c.id)); $('#gridFavs').innerHTML=l.length?l.map(card).join(''):'<div class="empty">Toca el corazón de una camioneta para guardarla aquí. Te avisamos antes de que cierre.</div>'; }
 function toggleFav(id){ if(!usuario){abrir('registro');return} favs.has(id)?favs.delete(id):favs.add(id); guardar(); refrescar(); toast(favs.has(id)?'Guardada en Me gusta':'Quitada de Me gusta'); }
 
@@ -836,7 +889,7 @@ function irA(v){
   $('#v-'+v).classList.add('on');
   document.querySelectorAll('nav button[data-v]').forEach(b=>b.classList.toggle('on',b.dataset.v===v));
   $('#nav').style.display=''; const st=$('.sticky'); if(st) st.remove();
-  if(v==='buscar')pintarBuscar(); if(v==='favs')pintarFavs(); if(v==='ordenes')pintarOrdenes(); if(v==='perfil')pintarPerfil(); if(v==='panel')pintarPanel();
+  if(v==='buscar')pintarBuscar(); if(v==='favs')pintarFavs(); if(v==='ordenes')pintarOrdenes(); if(v==='perfil')pintarPerfil(); if(v==='panel')pintarPanel(); if(v==='millas')pintarMillas();
   window.scrollTo(0,0);
 }
 
@@ -852,13 +905,32 @@ function prefs(){
   if(g('pNota')) p.push('Además: '+g('pNota'));
   return p.join('; ');
 }
+const MODOS={us:['Instalado en USA'],ambos:['Instalado en USA','Viaja dentro de la camioneta','Instalado en Venezuela'],ve:['En Venezuela']};
+const GRUPOS=[['us','Solo en Estados Unidos'],['ambos','Aquí o allá, tú escoges'],['ve','En Venezuela']];
 const EXTRAS=[
-  {id:'rep',n:'Reparación mínima en USA',d:'Lo necesario para que viaje',p:null},
-  {id:'pint',n:'Latonería, pintura y mecánica',d:'En nuestro taller de Venezuela',p:null},
-  {id:'son',n:'Sonido RM Pro',d:'Instalado en USA o en Venezuela',p:null},
-  {id:'acc',n:'Accesorios',d:'Rines, cauchos, barra de luces, lift…',p:null},
-  {id:'grua',n:'Grúa hasta tu casa',d:'Después de la aduana',p:null}
+  {id:'led',g:'us',n:'Techo de luces LED',d:'Lo instalamos aquí: en Venezuela no hay quien lo monte'},
+  {id:'rep',g:'us',n:'Reparación mínima en USA',d:'Lo necesario para que viaje'},
+  {id:'son',g:'ambos',n:'Car audio RM Pro Sound System',d:'RM Pro Sound System o la marca que quieras'},
+  {id:'caj',g:'ambos',n:'Chuchero o cajón',d:'Para tu sistema de sonido'},
+  {id:'cpl',g:'ambos',n:'Pantalla con CarPlay',d:'Android Auto y Apple CarPlay'},
+  {id:'ahu',g:'ambos',n:'Papel ahumado',d:'En todos los vidrios'},
+  {id:'cau',g:'ambos',n:'Cauchos',d:'Todo terreno o de calle, la medida que quieras'},
+  {id:'rin',g:'ambos',n:'Rines',d:'La medida y la marca que quieras'},
+  {id:'bar',g:'ambos',n:'Barra de luces LED',d:'En el parachoques o en el techo'},
+  {id:'par',g:'ambos',n:'Parachoques off-road',d:'Delantero y trasero'},
+  {id:'lif',g:'ambos',n:'Kit de elevación (lift)',d:'Más altura y presencia'},
+  {id:'rac',g:'ambos',n:'Rack de platón y carpa de techo',d:'Para salir de ruta'},
+  {id:'lat',g:'ve',n:'Latonería y pintura',d:'En nuestro taller de Venezuela'},
+  {id:'mec',g:'ve',n:'Mecánica',d:'En nuestro taller de Venezuela'},
+  {id:'ala',g:'ve',n:'Alarma y trancapalanca',d:'Seguridad para tu camioneta'},
+  {id:'grua',g:'ve',n:'Grúa hasta tu casa',d:'Después de la aduana'}
 ];
+function pintarSvcs(){
+  const k=carrito; if(!k.modo) k.modo={};
+  return GRUPOS.map(([g,t])=>`<div class="svcg">${t}</div>`+EXTRAS.filter(e=>e.g===g).map(e=>{const on=k.ex.includes(e.id), m=k.modo[e.id]||MODOS[g][0];
+    return `<button type="button" class="svc ${on?'on':''}" onclick="toggleSvc('${e.id}')"><div><b>${e.n}</b><small>${e.d}</small></div><span class="add">${on?'✓ Agregado':'+ Agregar'}</span></button>`+
+    (on&&g==='ambos'?`<div class="svcmodo">${MODOS.ambos.map(x=>`<button type="button" class="${x===m?'on':''}" onclick="modoSvc('${e.id}','${x}')">${x}</button>`).join('')}</div>`:'');}).join('')).join('');
+}
 function ficha(id){
   const c=CAMIONETAS.find(x=>x.id===id); if(!c){irA('inicio');return}
   if(!actual||actual.id!==id) carrito=null;
@@ -889,10 +961,12 @@ function ficha(id){
     <div class="box calc"><h3>¿Cuánto te sale tu camioneta?</h3>
       <div class="lockbox ${usuario?'':'locked'}" id="lock">
         <div class="res">
-          ${(c.cat!=='conces'||!c.puja)?`<div class="field"><label>${c.cat==='publica'?'Tu puja aproximada (USD)':'Precio aproximado que quieres pagar (USD)'}</label><input id="cPuja" type="number" inputmode="numeric" value="${c.puja||''}" placeholder="Ej. 40000" oninput="calcular()"></div>`:''}
+          ${(c.cat!=='conces'||!c.puja)?`<div class="field"><label>${c.cat==='publica'?'Tu puja aproximada (USD)':'Precio aproximado que quieres pagar (USD)'}</label><input id="cPuja" type="number" inputmode="numeric" value="${c.puja||c.aprox||''}" placeholder="Ej. 40000" oninput="calcular()"></div>`:''}
           <div class="field"><label>¿Dónde la recibes?</label><select id="cDest" onchange="calcular()">
             <option value="tierra" ${usuario&&usuario.ciudad==='Margarita'?'':'selected'}>Tierra firme (Caracas y resto del país)</option>
-            <option value="margarita" ${usuario&&usuario.ciudad==='Margarita'?'selected':''}>Margarita</option></select></div>
+            <option value="margarita" ${usuario&&usuario.ciudad==='Margarita'?'selected':''}>Margarita</option>
+            <option value="otra">Otra ciudad</option></select></div>
+          <div class="field" id="cCiuBox" style="display:none"><label>¿En qué ciudad?</label><input id="cCiu" placeholder="Ej. Upata, Maturín, Mérida"></div>
           <div id="lines"></div>
         </div>
         <div class="over"><b style="color:var(--navy)">Crea tu cuenta gratis para ver tu total</b><button class="btn gold" style="width:auto;padding:12px 22px" onclick="abrir('registro')">Crear mi cuenta</button></div>
@@ -922,7 +996,7 @@ function ficha(id){
   $('#nav').style.display='none';
   const old=$('.sticky'); if(old) old.remove();
   const st=document.createElement('div'); st.className='sticky';
-  st.innerHTML=`<div><small>${c.cat==='publica'?(c.firme?'Compra inmediata':'Puja actual'):'Precio'}</small><b>${c.puja?usd(c.puja):'Se cotiza'}</b></div><button class="btn gold" onclick="resumen()">${c.cat==='privada'?'Pedir esta camioneta ›':'Comprar ›'}</button>`;
+  st.innerHTML=`<div><small>${c.cat==='publica'?(c.firme?'Compra inmediata':'Puja actual'):c.aprox?'Desde aprox. (se cotiza)':'Precio'}</small><b>${c.puja?usd(c.puja):c.aprox?usd(c.aprox):'Se cotiza'}</b></div><button class="btn gold" onclick="resumen()">${c.cat==='privada'?'Pedir esta camioneta ›':'Comprar ›'}</button>`;
   document.body.appendChild(st);
   if(carrito&&carrito.c.id===id){ const f=carrito.f||{}; Object.keys(f).forEach(k=>{const e=document.getElementById(k); if(e) e.value=f[k];}); }
   calcular(); clearInterval(timerInt); if(c.cierra){tick();timerInt=setInterval(tick,1000)}
@@ -934,11 +1008,11 @@ function resumen(){
   const c=actual; if(!c) return;
   if(!usuario){abrir('registro');return}
   if($('#v-ficha').classList.contains('on')){
-    const f={}; ['pCol1','pCol2','pVer','pTrac','pAnio','pMi','pNota','cPuja','cDest'].forEach(k=>{const e=document.getElementById(k); if(e) f[k]=e.value;});
+    const f={}; ['pCol1','pCol2','pVer','pTrac','pAnio','pMi','pNota','cPuja','cDest','cCiu'].forEach(k=>{const e=document.getElementById(k); if(e) f[k]=e.value;});
     const sub=c.cat!=='conces', puja=f.cPuja!=null?(+f.cPuja||0):(c.puja||0);
     const total=puja?puja+(sub?feeSubasta(puja)+COSTOS.broker:0)+(sub?COSTOS.servicioSubasta:COSTOS.servicioConces)+(f.cDest==='margarita'?COSTOS.envioMargarita:COSTOS.envioTierra):0;
     const envioK=f.cDest==='margarita'?COSTOS.envioMargarita:COSTOS.envioTierra;
-    carrito={c,f,pr:prefs(),puja,total,pago1:total?total-envioK:0,dest:f.cDest==='margarita'?'Margarita':'tierra firme',ex:(carrito&&carrito.c.id===c.id?carrito.ex:[])};
+    carrito={c,f,pr:prefs(),puja,total,pago1:total?total-envioK:0,dest:f.cDest==='margarita'?'Margarita':f.cDest==='otra'?(f.cCiu||'otra ciudad'):'tierra firme',ex:(carrito&&carrito.c.id===c.id?carrito.ex:[]),modo:(carrito&&carrito.c.id===c.id?carrito.modo:{})};
   }
   if(!carrito) return;
   marcar({r:1});
@@ -958,7 +1032,7 @@ function resumen(){
     </div>`:''}
     <div class="box"><h3>¿Quieres agregarle algo?</h3>
       <p style="font-size:12.5px;color:var(--muted);margin:-4px 0 12px;line-height:1.45">Toca los que quieras. Tu asesor te los cotiza junto con tu orden.</p>
-      <div class="svcs">${EXTRAS.map(e=>`<button type="button" class="svc ${k.ex.includes(e.id)?'on':''}" data-id="${e.id}" onclick="toggleSvc(this)"><div><b>${e.n}</b><small>${e.d}</small></div><span class="add">${k.ex.includes(e.id)?'✓ Agregado':'+ Agregar'}</span></button>`).join('')}</div>
+      <div class="svcs" id="svcs">${pintarSvcs()}</div>
     </div>
     <div class="box"><h3>¿Cómo te contactamos?</h3>
       <p style="font-size:12.5px;color:var(--muted);margin:-4px 0 12px;line-height:1.45">Tu asesor te escribe a este número para seguir con tu orden.</p>
@@ -976,7 +1050,8 @@ function resumen(){
   document.body.appendChild(st);
   window.scrollTo(0,0);
 }
-function toggleSvc(b){ b.classList.toggle('on'); const on=b.classList.contains('on'); b.querySelector('.add').textContent=on?'✓ Agregado':'+ Agregar'; const id=b.dataset.id; carrito.ex=carrito.ex.filter(x=>x!==id); if(on) carrito.ex.push(id); }
+function toggleSvc(id){ const on=carrito.ex.includes(id); carrito.ex=carrito.ex.filter(x=>x!==id); if(!on) carrito.ex.push(id); $('#svcs').innerHTML=pintarSvcs(); }
+function modoSvc(id,m){ carrito.modo[id]=m; $('#svcs').innerHTML=pintarSvcs(); }
 function tick(){ const e=$('#count'); if(!e||!actual) return clearInterval(timerInt); const r=restante(actual.cierra); e.innerHTML=[[r.d,'DÍAS'],[r.h,'HORAS'],[r.m,'MIN'],[r.s,'SEG']].map(([n,l])=>`<div><b>${String(n).padStart(2,'0')}</b><small>${l}</small></div>`).join(''); }
 /* Comisión de Copart/IAA según su tabla pública (título no limpio, fondos seguros) + puja en línea + gate $95 + ambiental $15 */
 const TABLA_SUB=[[50,25],[100,45],[200,80],[300,130],[400,145],[500,185],[600,210],[700,240],[800,270],[900,295],[1000,320],[1500,430],[2000,510],[2500,570],[3000,610],[3500,655],[4000,705],[4500,725],[5000,750],[5500,775],[6000,800],[6500,825],[7000,845],[7500,880],[8000,900],[8500,925],[10000,945],[15000,1000]];
@@ -991,7 +1066,7 @@ function calcular(){
   const puja=$('#cPuja')?(+$('#cPuja').value||0):c.puja;
   const com=sub?feeSubasta(puja):0; if(!puja){$('#lines').innerHTML='<div class="calc note" style="font-size:13px;color:var(--muted)">Escribe un precio aproximado y te sale el total con el envío incluido.</div>';return}
   const serv=sub?COSTOS.servicioSubasta:COSTOS.servicioConces;
-  const dest=$('#cDest')?$('#cDest').value:'tierra';
+  const dest=$('#cDest')?$('#cDest').value:'tierra'; if($('#cCiuBox')) $('#cCiuBox').style.display=dest==='otra'?'':'none';
   const envio=dest==='margarita'?COSTOS.envioMargarita:COSTOS.envioTierra;
   const compra=puja+com+serv+(sub?COSTOS.broker:0);
   const total=compra+envio;
@@ -1010,7 +1085,7 @@ function comprar(){
   if(!cCiu){ toast('Dinos en qué ciudad vives'); const w=document.getElementById('oCiu'); if(w){w.focus();w.scrollIntoView({block:'center'});} return; }
   if(!usuario.wa){ usuario.wa=cWa; guardar(); if(sb&&usuario.uid) sb.from('perfiles').update({whatsapp:cWa}).eq('id',usuario.uid).then(()=>{}); }
   if(!carrito) return;
-  const c=actual, ex=carrito.ex.map(id=>EXTRAS.find(e=>e.id===id).n);
+  const c=actual, ex=carrito.ex.map(id=>{const e=EXTRAS.find(x=>x.id===id); return e.n+' ('+((carrito.modo||{})[id]||MODOS[e.g][0])+')';});
   const cod='I2-'+Math.random().toString(36).slice(2,7).toUpperCase();
   const pr=carrito.pr;
   if(sb&&usuario.uid){ sb.from('ordenes').insert({codigo:cod,vehiculo:`${c.an} ${c.marca} ${c.mod}`,detalle:{rubro:c.cat,lote:c.lote||'',vin:c.vin||'',precio:carrito.puja||null,total:carrito.total||null,pago1:carrito.pago1||null,destino:carrito.dest,prefs:pr,extras:ex,cliente:cNom,whatsapp:cWa,ciudad:cCiu}}).then(({error})=>{ if(error) toast('No se pudo guardar en línea: envíanos la orden por WhatsApp.'); }); }
@@ -1094,6 +1169,7 @@ async function cancelarOrden(cod){
   o.paso=0; guardar(); pintarOrdenes(); toast('Orden '+cod+' cancelada');
   avisarAnyi('Orden cancelada '+cod+' · '+o.nom,{Orden:cod,'Vehículo':o.nom,Cliente:usuario?usuario.nombre:'',WhatsApp:usuario?usuario.wa:'',Correo:usuario?usuario.mail:''});
 }
+function pintarMillas(){ const b=$('#milSaldo'); if(!b) return; b.innerHTML=usuario?`<section style="padding-bottom:0"><div class="box"><div class="saldo"><div><small style="font-size:12px;color:var(--muted);display:block">Tienes</small><b>${(usuario.millas??100).toLocaleString('es-VE')} millas</b></div><span style="font-size:12px;color:var(--gold);font-weight:700;text-align:right">Canjéalas con<br>tu asesor</span></div></div></section>`:''; }
 /* ===== PERFIL ===== */
 function pintarPerfil(){
   const b=$('#perfilBox');
@@ -1109,7 +1185,7 @@ function pintarPerfil(){
 /* ===== CUENTAS (Supabase; si no hay conexión, queda en el teléfono) ===== */
 let modo='reg';
 function modoAuth(m){modo=m;$('#tabReg').classList.toggle('on',m==='reg');$('#tabIn').classList.toggle('on',m==='in');document.querySelectorAll('.field.reg').forEach(f=>f.style.display=m==='reg'?'':'none');$('#authTitle').textContent=m==='reg'?'Crea tu cuenta':'Bienvenido de nuevo';$('#authBtn').textContent=m==='reg'?'Crear mi cuenta':'Entrar';}
-function msgError(e){const m=((e&&e.message)||'').toLowerCase(); if(m.includes('invalid login'))return 'Correo o contraseña incorrectos'; if(m.includes('already'))return 'Ese correo ya tiene cuenta. Toca "Ya tengo cuenta".'; if(m.includes('password'))return 'La contraseña debe tener al menos 6 caracteres'; if(m.includes('confirm'))return 'Confirma tu correo antes de entrar'; return 'No se pudo completar. Intenta de nuevo.';}
+function msgError(e){const m=((e&&e.message)||'').toLowerCase(); if(m.includes('invalid login'))return 'Correo o contraseña incorrectos'; if(m.includes('already')||m.includes('registered')||m.includes('exists'))return 'Este correo ya está en nuestro registro. Toca "Ya tengo cuenta" arriba y entra con tu contraseña.'; if(m.includes('fetch')||m.includes('network')||m.includes('failed'))return 'No hay conexión con el servidor. Revisa tu internet e intenta de nuevo.'; if(m.includes('password'))return 'La contraseña debe tener al menos 6 caracteres'; if(m.includes('confirm'))return 'Confirma tu correo antes de entrar'; return 'No se pudo completar. Intenta de nuevo.';}
 async function registrar(e){
   e.preventDefault();
   const mail=$('#rMail').value.trim(), pass=$('#rPass').value, btn=$('#authBtn');
@@ -1171,7 +1247,7 @@ async function millasCliente(uid,n){
 function refrescar(){
   if(usuario){$('#saludo').textContent='Hola,';$('#nombre').textContent=usuario.nombre.split(' ')[0]}else{$('#saludo').textContent='Bienvenido a Importa2';$('#nombre').textContent='Tu camioneta, llave en mano'}
   filtrar();
-  const mb=$('#milBtn'); if(mb) mb.textContent=usuario?'Ver mis millas':'Crea tu cuenta y recibe 100 millas';
+  const mb=$('#milBtn'); if(mb) mb.style.display=usuario?'none':'';
   if($('#v-ficha').classList.contains('on')&&actual){ $('#lock')?.classList.toggle('locked',!usuario); const f=$('#v-ficha .fav'); if(f) f.innerHTML=heart(favs.has(actual.id)); }
   if($('#v-favs').classList.contains('on'))pintarFavs();
   if($('#v-buscar').classList.contains('on'))pintarBuscar();
@@ -1252,22 +1328,17 @@ const esSafariIOS=esIOS&&/Safari/i.test(UA)&&!/CriOS|FxiOS|EdgiOS|OPiOS/i.test(U
 const ICO_SHARE='<span class="sym"><svg width="16" height="18" fill="none" stroke="#1F4FA3" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 11V1.5M4.5 5L8 1.5 11.5 5"/><path d="M5 8H2.5v8.5h11V8H11"/></svg></span>';
 const ICO_PLUS='<span class="sym"><svg width="16" height="16" fill="none" stroke="#1F4FA3" stroke-width="2" stroke-linecap="round"><rect x="1.5" y="1.5" width="13" height="13" rx="3"/><path d="M8 5v6M5 8h6"/></svg></span>';
 const ICO_DOTS='<span class="sym"><b style="color:#1F4FA3;font-size:15px;line-height:1">⋯</b></span>';
-function abrirInstalar(){
-  const head='<img class="ic" src="img/apple-touch-icon.png?v=3" alt="Importa2"><h2>Instala Importa2</h2>';
-  let body;
-  if(enAppAjena){
-    body='<p class="lead">Para tener Importa2 en tu teléfono, primero ábrela en tu navegador.</p><ol><li><span class="n">1</span><div>Toca los tres puntitos '+ICO_DOTS+' arriba o abajo de la pantalla</div></li><li><span class="n">2</span><div>Escoge <b>"Abrir en el navegador"</b>'+(esIOS?' o <b>"Abrir en Safari"</b>':'')+'</div></li><li><span class="n">3</span><div>Ahí te sale el botón para instalarla</div></li></ol><button class="btn gold" onclick="copiarLink()">Copiar el link del app</button>';
-  } else if(deferredInstall){
-    body='<p class="lead">Tenla en tu pantalla como cualquier app: entras con un toque, ves las camionetas nuevas y rastreas tu orden.</p><button class="btn gold" style="font-size:16px;padding:16px" onclick="instalarYa()">Instalar app</button>';
-  } else if(esIOS){
-    body='<p class="lead">Tenla en tu pantalla como cualquier app. Son 3 toques:</p><ol>'+
-      (esSafariIOS?'':'<li><span class="n">0</span><div>Abre este link en <b>Safari</b></div></li>')+
-      '<li><span class="n">1</span><div>Toca el botón de compartir '+ICO_SHARE+' (si no lo ves, toca primero '+ICO_DOTS+')</div></li><li><span class="n">2</span><div>Baja y toca <b>"Agregar a pantalla de inicio"</b> '+ICO_PLUS+'</div></li><li><span class="n">3</span><div>Toca <b>"Agregar"</b> arriba a la derecha</div></li></ol><div style="background:#FFF8E6;border:1px solid #F2D89A;border-radius:14px;padding:12px 14px;font-size:13px;color:var(--ink);line-height:1.45;text-align:left;margin-bottom:12px"><b>¿No ves esos botones?</b> Es porque abriste el link dentro de otra app (WhatsApp, Instagram, Claude…). Copia el link y pégalo en <b>Safari</b>.</div><button class="btn gold" onclick="copiarLink()">Copiar el link del app</button>';
-  } else {
-    body='<p class="lead">Tenla en tu pantalla como cualquier app.</p><ol><li><span class="n">1</span><div>Abre el menú del navegador '+ICO_DOTS+'</div></li><li><span class="n">2</span><div>Toca <b>"Instalar app"</b> o <b>"Agregar a la pantalla principal"</b></div></li></ol>';
-  }
-  $('#instCard').innerHTML=head+body+'<button class="later" onclick="cerrarInstalar()">Ahora no</button>';
-  $('#inst').classList.add('on');
+const esSamsung=/SamsungBrowser/i.test(UA);
+async function abrirInstalar(espera){
+  if(deferredInstall){ return instalarYa(); }
+  if(!esIOS&&!enAppAjena&&!espera){ for(let i=0;i<8&&!deferredInstall;i++) await new Promise(r=>setTimeout(r,250)); if(deferredInstall) return instalarYa(); }
+  let txt, pos;
+  if(enAppAjena){ txt='Abre este link en '+(esIOS?'Safari':'Chrome')+' para instalar el app'; pos='arriba'; }
+  else if(esIOS){ txt='Toca '+ICO_SHARE+' abajo y luego <b>"Agregar a inicio"</b>'; pos='abajo'; }
+  else if(esSamsung){ txt='Toca <b>≡</b> abajo y luego <b>"Agregar página a"</b> › <b>"Pantalla de inicio"</b>'; pos='abajo'; }
+  else { txt='Toca <b>⋮</b> arriba y luego <b>"Instalar app"</b>'; pos='arriba'; }
+  $('#instCard').innerHTML=`<div class="ib"><img src="img/icon-192.png?v=3" alt=""><div>${txt}</div><button onclick="cerrarInstalar()" aria-label="Cerrar">✕</button></div>${enAppAjena?'<button class="btn gold" style="margin-top:10px" onclick="copiarLink()">Copiar el link</button>':''}<div class="flecha2 ${pos}">${pos==='abajo'?'↓':'↑'}</div>`;
+  $('#inst').className='inst on '+pos;
 }
 async function instalarYa(){ if(!deferredInstall) return; deferredInstall.prompt(); let r={}; try{ r=await deferredInstall.userChoice; }catch(e){} deferredInstall=null; cerrarInstalar(); if(r.outcome==='accepted'){ toast('¡Listo! Importa2 quedó en tu pantalla'); const p=$('#instPill'); if(p) p.style.display='none'; } }
 function cerrarInstalar(){ $('#inst').classList.remove('on'); try{localStorage.setItem('i2inst',String(Date.now()))}catch(e){} }
