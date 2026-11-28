@@ -1407,7 +1407,7 @@ function copiarLink(){ const u='https://importa2desdeusa.github.io/'; try{naviga
 window.addEventListener('appinstalled',()=>{ const p=$('#instPill'); if(p) p.style.display='none'; });
 if(esApp()){ const p=$('#instPill'); if(p) p.style.display='none'; }
 /* la guía de instalar solo se abre cuando el cliente toca "Instalar app" */
-if('serviceWorker' in navigator && /github\.io$/.test(location.hostname)) navigator.serviceWorker.register('sw.js',{updateViaCache:'none'}).then(r=>r.update()).catch(()=>{});
+if('serviceWorker' in navigator && /(github\.io|importa2\.app)$/.test(location.hostname)) navigator.serviceWorker.register('sw.js',{updateViaCache:'none'}).then(r=>r.update()).catch(()=>{});
 try{ history.replaceState({v:'inicio'},''); }catch(e){}
 pintarCats(); pintarMarcas(); refrescar(); cargarCuenta();
 /* cintillo: imagen animada que se reproduce una vez al verse y queda fija */
